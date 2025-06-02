@@ -1,5 +1,5 @@
 """
-    academic_record.py
+    record.py
 
     Contains a singleton academic record class.
 """
@@ -8,7 +8,7 @@ from __future__ import annotations
 from model.grade import Grade
 from controller.file_manager import FileManager
 
-class AcademicRecord:
+class Record:
     """
         Stores and manages the academic record of the student.
     """
@@ -16,7 +16,7 @@ class AcademicRecord:
     # initialises the instance pointer
     instance = None
 
-    def __new__(cls) -> AcademicRecord:
+    def __new__(cls) -> Record:
         """
             Returns the only instance of the academic record.
         """
@@ -39,7 +39,7 @@ class AcademicRecord:
         self.record = []
 
     def set_record(self, record: list[list[str]]) -> None:
-        # ENG1012 79 D 6
+        # unit_code:str mark:str grade:str credit_pts:str
         pass
 
     def wam(self) -> str:
