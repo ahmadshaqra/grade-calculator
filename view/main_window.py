@@ -1,7 +1,7 @@
 """
     main_window.py
 
-    Contains the main window class.
+    Contains the main window UI logic.
 """
 
 import tkinter as tk
@@ -47,11 +47,11 @@ class MainWindow(tk.Tk):
 
         # sets frame to hold menu buttons
         menu_frame = tk.Frame(self)
-        menu_frame.pack(pady=10)
+        menu_frame.pack(pady=5)
 
         # sets main content frame
         self.main_frame = tk.Frame(self)
-        self.main_frame.pack(fill="both", expand=True, pady=10)
+        self.main_frame.pack(fill="both", expand=True, pady=5)
 
         # initialises available pages
         self.pages = {

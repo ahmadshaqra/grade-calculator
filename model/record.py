@@ -66,7 +66,7 @@ class Record:
 
         # calculates and returns wam rounded to 3 decimal places
         wam = weighted_marks / weighted_credits
-        return f"{wam:.3f}"
+        return f"{wam:06.3f}"
 
     def gpa(self) -> str:
         """
@@ -89,4 +89,4 @@ class Record:
 
         # calculates and returns gpa rounded to 3 decimal places
         gpa = total_grade / total_credits
-        return f"{gpa:.3f}"
+        return f"{gpa:05.3f}"
