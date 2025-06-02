@@ -4,15 +4,15 @@
     Runs the application.
 """
 
-from view.main_window import MainWindow
+from controller.app import App
 
-def main():
+def main() -> None:
     """
         Starts the application.
     """
 
     # initialises main window and starts application
-    app = MainWindow()
+    app = App()
     app.start()
 
 if __name__ == "__main__":

@@ -5,23 +5,21 @@
 """
 
 import tkinter as tk
-from view.record_page import RecordPage
-from view.wam_page import WAMPage
-from view.gpa_page import GPAPage
-from view.unit_page import UnitPage
+# from controller.app import App
 
 class MainWindow(tk.Tk):
     """
         Manages the main window of the application.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, app: 'App') -> None:
         """
             Initialises the main window of the application.
         """
 
-        # initialises main window
+        # initialises main window and app
         super().__init__()
+        self.app = app
 
         # sets title
         self.title("Grade Calculator")
@@ -46,51 +44,29 @@ class MainWindow(tk.Tk):
         tk.Label(self, text="Grade Calculator", font=("Segoe UI", 20, "bold")).pack(pady=10)
 
         # sets frame to hold menu buttons
-        menu_frame = tk.Frame(self)
-        menu_frame.pack(pady=5)
+        self.menu_frame = tk.Frame(self)
+        self.menu_frame.pack(pady=5)
 
         # sets main content frame
         self.main_frame = tk.Frame(self)
         self.main_frame.pack(fill="both", expand=True, pady=5)
 
-        # initialises available pages
-        self.pages = {
-            "Record": RecordPage(self.main_frame),
-            "WAM": WAMPage(self.main_frame),
-            "GPA": GPAPage(self.main_frame),
-            "Unit": UnitPage(self.main_frame)
-        }
+    def set_menu(self, pages: list[str]) -> None:
 
         # initialises menu buttons dictionary
         self.menu_btns = {}
 
         # iterates through pages
-        for name, page in self.pages.items():
-
-            # places page in main content frame
-            page.place(relx=0, rely=0, relwidth=1, relheight=1)
+        for name in pages:
 
             # creates and adds menu button
-            self.menu_btns[name] = tk.Button(menu_frame, text=name, font=("Segoe UI", 10, "bold"), width=10, command=lambda name=name: self.show_page(name))
+            self.menu_btns[name] = tk.Button(self.menu_frame, text=name, font=("Segoe UI", 10, "bold"), width=10, command=lambda name=name: self.app.show_page(name))
             self.menu_btns[name].pack(side="left", expand=True, fill="both", padx=10)
 
         # selects the first page
-        self.show_page(next(iter(self.pages)))
+        self.app.show_page(next(iter(pages)))
 
-    def show_page(self, name: str) -> None:
-        """
-            Displays selected page on the main content frame.
-
-            Args:
-                name (str): the name of the selected page.
-        """
-
-        # gets the page object from the pages dictionary
-        page = self.pages[name]
-
-        # displays page contents and refreshes it
-        page.lift()
-        page.refresh()
+    def select_button(self, name: str) -> None:
 
         # enables all menu buttons
         for btn in self.menu_btns.values():
@@ -99,10 +75,32 @@ class MainWindow(tk.Tk):
         # disables selected page menu button
         self.menu_btns[name].config(state="disabled")
 
-    def start(self) -> None:
-        """
-            Starts the window.
-        """
+    # def show_page(self, name: str) -> None:
+    #     """
+    #         Displays selected page on the main content frame.
 
-        # calls the main loop of the window.
-        self.mainloop()
+    #         Args:
+    #             name (str): the name of the selected page.
+    #     """
+
+    #     # gets the page object from the pages dictionary
+    #     page = self.pages[name]
+
+    #     # displays page contents and refreshes it
+    #     page.lift()
+    #     page.refresh()
+
+    #     # enables all menu buttons
+    #     for btn in self.menu_btns.values():
+    #         btn.config(state="normal")
+
+    #     # disables selected page menu button
+    #     self.menu_btns[name].config(state="disabled")
+
+    # def start(self) -> None:
+    #     """
+    #         Starts the window.
+    #     """
+
+    #     # calls the main loop of the window.
+    #     self.mainloop()

@@ -1,34 +1,17 @@
 """
     record.py
 
-    Contains a singleton academic record class.
+    Contains an academic record class.
 """
 
 from __future__ import annotations
+from typing import Any
 from model.grade import Grade
-from controller.file_manager import FileManager
 
 class Record:
     """
         Stores and manages the academic record of the student.
     """
-
-    # initialises the instance pointer
-    instance = None
-
-    def __new__(cls) -> Record:
-        """
-            Returns the only instance of the academic record.
-        """
-
-        # checks if an instance exists
-        if cls.instance is None:
-
-            # creates a new instance
-            cls.instance = super().__new__(cls)
-
-        # returns the instance
-        return cls.instance
 
     def __init__(self) -> None:
         """
@@ -39,8 +22,23 @@ class Record:
         self.record = []
 
     def set_record(self, record: list[list[str]]) -> None:
-        # unit_code:str mark:str grade:str credit_pts:str
-        pass
+        """
+            Sets the academic record.
+
+            Args:
+                record (list[list[str]]): the raw record information.
+        """
+
+        # clears record
+        self.record = []
+
+        # iterates through each unit and adds it to the record
+        for unit_no, unit_code, mark, grade, credit_pts in record:
+            self.record.append({"unit_no": int(unit_no),
+                                "unit_code": unit_code,
+                                "mark": int(mark),
+                                "grade": Grade[grade],
+                                "credit_pts": int(credit_pts)})
 
     def wam(self) -> str:
         """

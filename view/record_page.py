@@ -4,6 +4,7 @@
     Contains the record page UI logic.
 """
 
+from typing import Any
 import tkinter as tk
 from tkinter import ttk
 
@@ -22,6 +23,7 @@ class RecordPage(tk.Frame):
 
         # initialises the frame
         super().__init__(root)
+        self.place(relx=0, rely=0, relwidth=1, relheight=1)
 
         # sets frame to hold table
         table_frame = tk.Frame(self, width=500, height=190)
@@ -70,8 +72,15 @@ class RecordPage(tk.Frame):
         self.gpa_lbl = tk.Label(results_frame, text="0.000", font=("Segoe UI", 10))
         self.gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
-    def refresh(self) -> None:
-        pass
+    def refresh(self, data: list[dict[str, Any]], wam: str, gpa: str) -> None:
+        for row in self.table.get_children():
+            self.table.delete(row)
+
+        for row in data:
+            self.table.insert("", "end", values=row)
+        
+        self.wam_lbl.config(text=wam)
+        self.gpa_lbl.config(text=gpa)
 
     def add_unit(self) -> None:
         pass
