@@ -13,7 +13,7 @@ class AcademicRecord:
 
     def __init__(self) -> None:
         """
-            Initialises the academic record.
+            Initialises the academic record from file.
         """
 
         # gets data from file
@@ -111,7 +111,7 @@ class AcademicRecord:
         """
 
         # appends the unit to the data array
-        self.data.append(unit)
+        self.data.append([str(len(self.data) + 1)] + unit)
 
     def remove_unit(self) -> None:
         """
@@ -123,3 +123,19 @@ class AcademicRecord:
 
             # removes the last unit from the data array
             self.data.pop()
+
+    def save_record(self) -> None:
+        """
+            Saves the record to file.
+        """
+
+        # writes data to file
+        FileManager.write_file("record.txt", self.data)
+
+    def reset(self) -> None:
+        """
+            Reinitialises the academic record from file.
+        """
+
+        # gets data from file
+        self.data = FileManager.read_file("record.txt")

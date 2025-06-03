@@ -29,8 +29,8 @@ class MainWindow(tk.Tk):
         self.title("Grade Calculator")
 
         # sets the window dimensions
-        window_width = 600
-        window_height = 400
+        window_width = 700
+        window_height = 500
 
         # gets the screen dimensions
         screen_width = self.winfo_screenwidth()
@@ -49,11 +49,11 @@ class MainWindow(tk.Tk):
 
         # sets frame to hold menu buttons
         self.menu_frame = tk.Frame(self)
-        self.menu_frame.pack(pady=5)
+        self.menu_frame.pack(pady=10)
 
         # sets main content frame
         self.main_frame = tk.Frame(self)
-        self.main_frame.pack(fill="both", expand=True, pady=5)
+        self.main_frame.pack(fill="both", expand=True, pady=10)
 
         # initialises available pages
         self.pages = {
