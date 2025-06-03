@@ -5,7 +5,7 @@
 """
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from data.academic_record import AcademicRecord
 from utils.file_manager import FileManager
 
@@ -125,3 +125,6 @@ class RecordPage(tk.Frame):
 
         # gets the record data and writes it to a file
         FileManager.write_file("record.txt", self.academic_record.get_data())
+
+        # displays success message to user
+        messagebox.showinfo("Success", "Record saved successfully!")
