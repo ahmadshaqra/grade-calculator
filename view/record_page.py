@@ -72,13 +72,19 @@ class RecordPage(tk.Frame):
         self.gpa_lbl = tk.Label(results_frame, text="0.000", font=("Segoe UI", 10))
         self.gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
-    def refresh(self, data: list[dict[str, Any]], wam: str, gpa: str) -> None:
+    def set_controller(self, record_manager: 'RecordManager') -> None:
+        self.record_manager = record_manager
+
+    def refresh(self, data: list[list[str]], wam: str, gpa: str) -> None:
+
+
         for row in self.table.get_children():
             self.table.delete(row)
 
+
         for row in data:
             self.table.insert("", "end", values=row)
-        
+
         self.wam_lbl.config(text=wam)
         self.gpa_lbl.config(text=gpa)
 
@@ -86,7 +92,14 @@ class RecordPage(tk.Frame):
         pass
 
     def remove_unit(self) -> None:
-        pass
+        children = self.table.get_children()
+        if len(children) > 0:
+            self.table.delete(children[-1])
 
     def save_record(self) -> None:
-        pass
+        data = []
+        for child in self.table.get_children():
+            row = self.table.item(child)["values"]
+            data.append([str(item) for item in row])
+
+        self.record_manager.save_record(data)

@@ -1,16 +1,26 @@
 from model.record import Record
 from view.record_page import RecordPage
+from utils.file_manager import FileManager
 
 class RecordManager:
 
-    def __init__(self, file_manager: 'FileManager', main_window: 'MainWindow') -> None:
+    def __init__(self, page: RecordPage) -> None:
 
-        self.file_manager = file_manager
+        self.filename = "record.txt"
+
         self.data = Record()
-        self.page = RecordPage(main_window.main_frame)
+        self.page = page
 
-        data = self.file_manager.read_file("record.txt")
-        print(data)
-        self.data.set_record(data)
+        self.page.set_controller(self)
+
+        data = FileManager.read_file(self.filename)
+
+        self.data.set_data(data)
 
         self.page.refresh(data, self.data.wam(), self.data.gpa())
+
+    def save_record(self, data: list[list[str]]) -> None:
+        FileManager.write_file(self.filename, data)
+        self.data.set_data(data)
+        self.page.refresh(data, self.data.wam(), self.data.gpa())
+        

@@ -5,7 +5,6 @@
 """
 
 import tkinter as tk
-# from controller.app import App
 
 class MainWindow(tk.Tk):
     """
@@ -74,33 +73,3 @@ class MainWindow(tk.Tk):
 
         # disables selected page menu button
         self.menu_btns[name].config(state="disabled")
-
-    # def show_page(self, name: str) -> None:
-    #     """
-    #         Displays selected page on the main content frame.
-
-    #         Args:
-    #             name (str): the name of the selected page.
-    #     """
-
-    #     # gets the page object from the pages dictionary
-    #     page = self.pages[name]
-
-    #     # displays page contents and refreshes it
-    #     page.lift()
-    #     page.refresh()
-
-    #     # enables all menu buttons
-    #     for btn in self.menu_btns.values():
-    #         btn.config(state="normal")
-
-    #     # disables selected page menu button
-    #     self.menu_btns[name].config(state="disabled")
-
-    # def start(self) -> None:
-    #     """
-    #         Starts the window.
-    #     """
-
-    #     # calls the main loop of the window.
-    #     self.mainloop()

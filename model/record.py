@@ -19,26 +19,32 @@ class Record:
         """
 
         # initialises the record array
+        self.data = []
         self.record = []
 
-    def set_record(self, record: list[list[str]]) -> None:
+    def set_data(self, data: list[list[str]]) -> None:
         """
             Sets the academic record.
 
             Args:
-                record (list[list[str]]): the raw record information.
+                data (list[list[str]]): the raw record information.
         """
+
+        self.data = data
 
         # clears record
         self.record = []
 
         # iterates through each unit and adds it to the record
-        for unit_no, unit_code, mark, grade, credit_pts in record:
+        for unit_no, unit_code, mark, grade, credit_pts in data:
             self.record.append({"unit_no": int(unit_no),
                                 "unit_code": unit_code,
                                 "mark": int(mark),
                                 "grade": Grade[grade],
                                 "credit_pts": int(credit_pts)})
+ 
+    def get_data(self) -> list[list[str]]:
+        return self.data
 
     def wam(self) -> str:
         """
@@ -62,6 +68,9 @@ class Record:
             weighted_marks += unit["mark"] * unit["credit_pts"] * weight
             weighted_credits += unit["credit_pts"] * weight
 
+        if weighted_credits == 0:
+            return "00.000"
+
         # calculates and returns wam rounded to 3 decimal places
         wam = weighted_marks / weighted_credits
         return f"{wam:06.3f}"
@@ -84,6 +93,9 @@ class Record:
             # adds unit grade value and credits to totals
             total_grade += unit["grade"].value * unit["credit_pts"]
             total_credits += unit["credit_pts"]
+
+        if total_credits == 0:
+            return "0.000"
 
         # calculates and returns gpa rounded to 3 decimal places
         gpa = total_grade / total_credits

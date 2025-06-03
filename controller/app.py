@@ -1,8 +1,12 @@
 
 
 
-from controller.file_manager import FileManager
 from view.main_window import MainWindow
+
+from view.record_page import RecordPage
+from view.wam_page import WAMPage
+from view.gpa_page import GPAPage
+from view.unit_page import UnitPage
 
 from controller.record_manager import RecordManager
 from controller.wam_manager import WAMManager
@@ -13,21 +17,26 @@ class App:
 
     def __init__(self):
 
-        self.file_manager = FileManager()
         self.main_window = MainWindow(self)
 
-        self.controllers = {
-            "Record": RecordManager(self.file_manager, self.main_window),
-            "WAM": WAMManager(self.file_manager, self.main_window),
-            "GPA": GPAManager(self.file_manager, self.main_window),
-            "Unit": UnitManager(self.file_manager, self.main_window)
+        self.pages = {
+            "Record": RecordPage(self.main_window.main_frame),
+            # "WAM": WAMPage(self.main_window.main_frame),
+            # "GPA": GPAPage(self.main_window.main_frame),
+            # "Unit": UnitPage(self.main_window.main_frame)
         }
 
-        self.main_window.set_menu(self.controllers.keys())
+        self.main_window.set_menu(self.pages.keys())
+
+        self.controllers = {
+            "Record": RecordManager(self.pages["Record"]),
+            # "WAM": WAMManager(self.pages["WAM"]),
+            # "GPA": GPAManager(self.pages["GPA"]),
+            # "Unit": UnitManager(self.pages["Unit"])
+        }
 
     def start(self):
         self.main_window.mainloop()
-
 
     def show_page(self, name: str) -> None:
         """
@@ -38,7 +47,7 @@ class App:
         """
 
         # gets the page object from the pages dictionary
-        page = self.controllers[name].page
+        page = self.pages[name]
 
         # displays page contents and refreshes it
         page.lift()
