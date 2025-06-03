@@ -4,7 +4,7 @@
     Runs the application.
 """
 
-from controller.app import App
+from app.main_window import MainWindow
 
 def main() -> None:
     """
@@ -12,7 +12,7 @@ def main() -> None:
     """
 
     # initialises main window and starts application
-    app = App()
+    app = MainWindow()
     app.start()
 
 if __name__ == "__main__":

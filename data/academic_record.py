@@ -1,19 +1,17 @@
 """
-    record.py
+    academic_record.py
 
     Contains an academic record class.
 """
 
-from __future__ import annotations
-from typing import Any
-from model.grade import Grade
+from data.grade import Grade
 
-class Record:
+class AcademicRecord:
     """
         Stores and manages the academic record of the student.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, data: list[list[str]]) -> None:
         """
             Initialises the academic record.
         """
@@ -21,6 +19,8 @@ class Record:
         # initialises the record array
         self.data = []
         self.record = []
+
+        self.set_data(data)
 
     def set_data(self, data: list[list[str]]) -> None:
         """
