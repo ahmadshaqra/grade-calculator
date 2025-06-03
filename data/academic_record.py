@@ -1,14 +1,12 @@
 """
-    record.py
+    academic_record.py
 
     Contains an academic record class.
 """
 
-from __future__ import annotations
-from typing import Any
-from model.grade import Grade
+from utils.file_manager import FileManager
 
-class Record:
+class AcademicRecord:
     """
         Stores and manages the academic record of the student.
     """
@@ -18,35 +16,13 @@ class Record:
             Initialises the academic record.
         """
 
-        # initialises the record array
-        self.data = []
-        self.record = []
+        # gets data from file
+        self.data = FileManager.read_file("record.txt")
 
-    def set_data(self, data: list[list[str]]) -> None:
-        """
-            Sets the academic record.
-
-            Args:
-                data (list[list[str]]): the raw record information.
-        """
-
-        self.data = data
-
-        # clears record
-        self.record = []
-
-        # iterates through each unit and adds it to the record
-        for unit_no, unit_code, mark, grade, credit_pts in data:
-            self.record.append({"unit_no": int(unit_no),
-                                "unit_code": unit_code,
-                                "mark": int(mark),
-                                "grade": Grade[grade],
-                                "credit_pts": int(credit_pts)})
- 
     def get_data(self) -> list[list[str]]:
         return self.data
 
-    def wam(self) -> str:
+    def get_wam(self) -> str:
         """
             Calculates and returns the WAM of the academic record.
 
@@ -59,14 +35,14 @@ class Record:
         weighted_credits = 0
 
         # iterates through each unit in the record
-        for unit in self.record:
+        for _, unit_code, mark, _, credit_pts in self.data:
 
             # gets weighting of unit
-            weight = 0.5 if unit["unit_code"][3] == '1' else 1.0
+            weight = 0.5 if unit_code[3] == '1' else 1.0
 
             # adds unit weighted marks and credits to totals
-            weighted_marks += unit["mark"] * unit["credit_pts"] * weight
-            weighted_credits += unit["credit_pts"] * weight
+            weighted_marks += int(mark) * int(credit_pts) * weight
+            weighted_credits += int(credit_pts) * weight
 
         if weighted_credits == 0:
             return "00.000"
@@ -75,7 +51,7 @@ class Record:
         wam = weighted_marks / weighted_credits
         return f"{wam:06.3f}"
 
-    def gpa(self) -> str:
+    def get_gpa(self) -> str:
         """
             Calculates and returns the GPA of the academic record.
 
@@ -88,11 +64,11 @@ class Record:
         total_credits = 0
 
         # iterates through each unit in the record
-        for unit in self.record:
+        for _, _, _, grade, credit_pts in self.data:
 
             # adds unit grade value and credits to totals
-            total_grade += unit["grade"].value * unit["credit_pts"]
-            total_credits += unit["credit_pts"]
+            total_grade += self.grade_value(grade) * int(credit_pts)
+            total_credits += int(credit_pts)
 
         if total_credits == 0:
             return "0.000"
@@ -100,3 +76,26 @@ class Record:
         # calculates and returns gpa rounded to 3 decimal places
         gpa = total_grade / total_credits
         return f"{gpa:05.3f}"
+
+    def grade_value(self, grade: str) -> float:
+        
+        match grade:
+            case "WN":
+                return 0.0
+            case "N":
+                return 0.3
+            case "P":
+                return 1.0
+            case "C":
+                return 2.0
+            case "D":
+                return 3.0
+            case "HD":
+                return 4.0
+
+    def remove_unit(self) -> None:
+        if len(self.data) > 0:
+            self.data.pop()
+    
+    def add_unit(self, unit: list[str]) -> None:
+        self.data.append(unit)

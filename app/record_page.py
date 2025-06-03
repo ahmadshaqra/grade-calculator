@@ -1,29 +1,31 @@
 """
     record_page.py
 
-    Contains the record page UI logic.
+    Contains the record page logic.
 """
 
-from typing import Any
 import tkinter as tk
 from tkinter import ttk
+from data.academic_record import AcademicRecord
+from utils.file_manager import FileManager
 
 class RecordPage(tk.Frame):
     """
         Manages the record page.
     """
 
-    def __init__(self, root: tk.Frame) -> None:
+    def __init__(self, root: tk.Frame, academic_record: AcademicRecord) -> None:
         """
             Initialises the record page.
 
             Args:
                 root (tk.Frame): the main contents frame.
+                academic_record (AcademicRecord): the academic record of the student.
         """
 
         # initialises the frame
         super().__init__(root)
-        self.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.academic_record = academic_record
 
         # sets frame to hold table
         table_frame = tk.Frame(self, width=500, height=190)
@@ -72,21 +74,19 @@ class RecordPage(tk.Frame):
         self.gpa_lbl = tk.Label(results_frame, text="0.000", font=("Segoe UI", 10))
         self.gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
-    def set_controller(self, record_manager: 'RecordManager') -> None:
-        self.record_manager = record_manager
+    def load_page(self) -> None:
 
-    def refresh(self, data: list[list[str]], wam: str, gpa: str) -> None:
-
-
+        # clear current table
         for row in self.table.get_children():
             self.table.delete(row)
 
+        # add units from academic record to table
+        for unit in self.academic_record.get_data():
+            self.table.insert("", "end", values=unit)
 
-        for row in data:
-            self.table.insert("", "end", values=row)
-
-        self.wam_lbl.config(text=wam)
-        self.gpa_lbl.config(text=gpa)
+        # set wam and gpa
+        self.wam_lbl.config(text=self.academic_record.get_wam())
+        self.gpa_lbl.config(text=self.academic_record.get_gpa())
 
     def add_unit(self) -> None:
         pass
@@ -95,11 +95,12 @@ class RecordPage(tk.Frame):
         children = self.table.get_children()
         if len(children) > 0:
             self.table.delete(children[-1])
+        self.academic_record.remove_unit()
+        
+        # set wam and gpa
+        self.wam_lbl.config(text=self.academic_record.get_wam())
+        self.gpa_lbl.config(text=self.academic_record.get_gpa())
 
     def save_record(self) -> None:
-        data = []
-        for child in self.table.get_children():
-            row = self.table.item(child)["values"]
-            data.append([str(item) for item in row])
 
-        self.record_manager.save_record(data)
+        FileManager.write_file("record.txt", self.academic_record.get_data())
