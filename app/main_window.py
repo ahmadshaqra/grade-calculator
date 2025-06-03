@@ -5,7 +5,6 @@
 """
 
 import tkinter as tk
-from utils.file_manager import FileManager
 from data.academic_record import AcademicRecord
 from app.record_page import RecordPage
 from app.wam_page import WAMPage
@@ -24,7 +23,7 @@ class MainWindow(tk.Tk):
 
         # initialises main window and models
         super().__init__()
-        self.academic_record = AcademicRecord(FileManager.read_file("record.txt"))
+        self.academic_record = AcademicRecord()
 
         # sets title
         self.title("Grade Calculator")
@@ -93,7 +92,7 @@ class MainWindow(tk.Tk):
 
         # displays page contents and refreshes it
         page.lift()
-        page.refresh()
+        page.load_page()
 
         # enables all menu buttons
         for btn in self.menu_btns.values():

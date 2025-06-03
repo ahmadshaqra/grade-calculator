@@ -74,7 +74,7 @@ class RecordPage(tk.Frame):
         self.gpa_lbl = tk.Label(results_frame, text="0.000", font=("Segoe UI", 10))
         self.gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
-    def refresh(self) -> None:
+    def load_page(self) -> None:
 
         # clear current table
         for row in self.table.get_children():
@@ -85,8 +85,8 @@ class RecordPage(tk.Frame):
             self.table.insert("", "end", values=unit)
 
         # set wam and gpa
-        self.wam_lbl.config(text=self.academic_record.wam())
-        self.gpa_lbl.config(text=self.academic_record.gpa())
+        self.wam_lbl.config(text=self.academic_record.get_wam())
+        self.gpa_lbl.config(text=self.academic_record.get_gpa())
 
     def add_unit(self) -> None:
         pass
@@ -95,16 +95,12 @@ class RecordPage(tk.Frame):
         children = self.table.get_children()
         if len(children) > 0:
             self.table.delete(children[-1])
+        self.academic_record.remove_unit()
+        
+        # set wam and gpa
+        self.wam_lbl.config(text=self.academic_record.get_wam())
+        self.gpa_lbl.config(text=self.academic_record.get_gpa())
 
     def save_record(self) -> None:
-        data = []
-        for child in self.table.get_children():
-            row = self.table.item(child)["values"]
-            data.append([str(item) for item in row])
 
-        # self.record_manager.save_record(data)
-
-        FileManager.write_file(self.filename, data)
-        self.data.set_data(data)
-        self.page.refresh(data, self.data.wam(), self.data.gpa())
-    
+        FileManager.write_file("record.txt", self.academic_record.get_data())
