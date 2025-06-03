@@ -75,6 +75,9 @@ class RecordPage(tk.Frame):
         self.gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
     def load_page(self) -> None:
+        """
+            Loads page from data.
+        """
 
         # clear current table
         for row in self.table.get_children():
@@ -91,16 +94,34 @@ class RecordPage(tk.Frame):
     def add_unit(self) -> None:
         pass
 
+        """
+            Add entry boxes to record page.
+            Entry boxes needed: Unit Code, Mark, Grade, Credit Points.
+            Make main window bigger.
+            Handle add unit logic.
+        """
+
     def remove_unit(self) -> None:
-        children = self.table.get_children()
-        if len(children) > 0:
-            self.table.delete(children[-1])
+        """
+            Removes the last unit.
+        """
+
+        # deletes the last row of the table
+        rows = self.table.get_children()
+        if len(rows) > 0:
+            self.table.delete(rows[-1])
+
+        # removes the last unit in the record
         self.academic_record.remove_unit()
-        
-        # set wam and gpa
+
+        # updates wam and gpa
         self.wam_lbl.config(text=self.academic_record.get_wam())
         self.gpa_lbl.config(text=self.academic_record.get_gpa())
 
     def save_record(self) -> None:
+        """
+            Saves the current record.
+        """
 
+        # gets the record data and writes it to a file
         FileManager.write_file("record.txt", self.academic_record.get_data())

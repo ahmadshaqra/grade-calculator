@@ -20,6 +20,14 @@ class AcademicRecord:
         self.data = FileManager.read_file("record.txt")
 
     def get_data(self) -> list[list[str]]:
+        """
+            Returns the academic record.
+
+            Returns:
+                list[list[str]]: the academic record.
+        """
+
+        # returns the data array
         return self.data
 
     def get_wam(self) -> str:
@@ -44,6 +52,7 @@ class AcademicRecord:
             weighted_marks += int(mark) * int(credit_pts) * weight
             weighted_credits += int(credit_pts) * weight
 
+        # checks if there are no units in the record
         if weighted_credits == 0:
             return "00.000"
 
@@ -66,10 +75,26 @@ class AcademicRecord:
         # iterates through each unit in the record
         for _, _, _, grade, credit_pts in self.data:
 
+            # gets grade value
+            match grade:
+                case "WN":
+                    grade_value = 0.0
+                case "N":
+                    grade_value = 0.3
+                case "P":
+                    grade_value = 1.0
+                case "C":
+                    grade_value = 2.0
+                case "D":
+                    grade_value = 3.0
+                case "HD":
+                    grade_value = 4.0
+
             # adds unit grade value and credits to totals
-            total_grade += self.grade_value(grade) * int(credit_pts)
+            total_grade += grade_value * int(credit_pts)
             total_credits += int(credit_pts)
 
+        # checks if there are no units in the record
         if total_credits == 0:
             return "0.000"
 
@@ -77,25 +102,24 @@ class AcademicRecord:
         gpa = total_grade / total_credits
         return f"{gpa:05.3f}"
 
-    def grade_value(self, grade: str) -> float:
-        
-        match grade:
-            case "WN":
-                return 0.0
-            case "N":
-                return 0.3
-            case "P":
-                return 1.0
-            case "C":
-                return 2.0
-            case "D":
-                return 3.0
-            case "HD":
-                return 4.0
+    def add_unit(self, unit: list[str]) -> None:
+        """
+            Adds a unit to the academic record.
+
+            Args:
+                unit (list[str]): the unit to add.
+        """
+
+        # appends the unit to the data array
+        self.data.append(unit)
 
     def remove_unit(self) -> None:
+        """
+            Removes the last unit in the academic record.
+        """
+
+        # checks if there are units in the data array
         if len(self.data) > 0:
+
+            # removes the last unit from the data array
             self.data.pop()
-    
-    def add_unit(self, unit: list[str]) -> None:
-        self.data.append(unit)
