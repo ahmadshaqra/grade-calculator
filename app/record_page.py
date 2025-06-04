@@ -6,8 +6,8 @@
 
 import tkinter as tk
 from tkinter import ttk, messagebox
-import re
 from data.academic_record import AcademicRecord
+from re import fullmatch
 
 class RecordPage(tk.Frame):
     """
@@ -204,7 +204,7 @@ class RecordPage(tk.Frame):
         credit_pts = self.credit_pts.get()
 
         # validates unit code
-        if not re.fullmatch(r"[A-Z]{3}\d{4}", unit_code):
+        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code):
             messagebox.showerror("Input Error", "Unit code is invalid.")
             return
 
