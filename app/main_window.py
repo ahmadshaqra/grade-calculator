@@ -5,7 +5,6 @@
 """
 
 import tkinter as tk
-from data.academic_record import AcademicRecord
 from app.record_page import RecordPage
 from app.wam_page import WAMPage
 from app.gpa_page import GPAPage
@@ -21,9 +20,8 @@ class MainWindow(tk.Tk):
             Initialises the main window of the application.
         """
 
-        # initialises main window and models
+        # initialises main window
         super().__init__()
-        self.academic_record = AcademicRecord()
 
         # sets title
         self.title("Grade Calculator")
@@ -57,7 +55,7 @@ class MainWindow(tk.Tk):
 
         # initialises available pages
         self.pages = {
-            "Record": RecordPage(self.main_frame, self.academic_record),
+            "Record": RecordPage(self.main_frame),
             "WAM": WAMPage(self.main_frame),
             "GPA": GPAPage(self.main_frame),
             "Unit": UnitPage(self.main_frame)

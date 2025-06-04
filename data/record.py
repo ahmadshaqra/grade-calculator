@@ -1,19 +1,19 @@
 """
-    academic_record.py
+    record.py
 
-    Contains an academic record class.
+    Contains an record class.
 """
 
 from utils.file_manager import FileManager
 
-class AcademicRecord:
+class Record:
     """
-        Stores and manages the academic record of the student.
+        Stores and manages the record of the student.
     """
 
     def __init__(self) -> None:
         """
-            Initialises the academic record from file.
+            Initialises the record from file.
         """
 
         # gets data from file
@@ -21,10 +21,10 @@ class AcademicRecord:
 
     def get_data(self) -> list[list[str]]:
         """
-            Returns the academic record.
+            Returns the record.
 
             Returns:
-                list[list[str]]: the academic record.
+                list[list[str]]: the record.
         """
 
         # returns the data array
@@ -32,7 +32,7 @@ class AcademicRecord:
 
     def get_wam(self) -> str:
         """
-            Calculates and returns the WAM of the academic record.
+            Calculates and returns the WAM of the record.
 
             Returns:
                 str: the WAM rounded to 3 decimal places.
@@ -62,7 +62,7 @@ class AcademicRecord:
 
     def get_gpa(self) -> str:
         """
-            Calculates and returns the GPA of the academic record.
+            Calculates and returns the GPA of the record.
 
             Returns:
                 str: the GPA rounded to 3 decimal places.
@@ -104,7 +104,7 @@ class AcademicRecord:
 
     def add_unit(self, unit: list[str]) -> None:
         """
-            Adds a unit to the academic record.
+            Adds a unit to the record.
 
             Args:
                 unit (list[str]): the unit to add.
@@ -115,7 +115,7 @@ class AcademicRecord:
 
     def remove_unit(self) -> None:
         """
-            Removes the last unit in the academic record.
+            Removes the last unit in the record.
         """
 
         # checks if there are units in the data array
@@ -124,7 +124,7 @@ class AcademicRecord:
             # removes the last unit from the data array
             self.data.pop()
 
-    def save_record(self) -> None:
+    def save(self) -> None:
         """
             Saves the record to file.
         """
@@ -134,7 +134,7 @@ class AcademicRecord:
 
     def reset(self) -> None:
         """
-            Reinitialises the academic record from file.
+            Reinitialises the record from file.
         """
 
         # gets data from file

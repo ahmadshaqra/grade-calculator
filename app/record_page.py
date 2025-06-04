@@ -6,7 +6,7 @@
 
 import tkinter as tk
 from tkinter import ttk, messagebox
-from data.academic_record import AcademicRecord
+from data.record import Record
 from re import fullmatch
 
 class RecordPage(tk.Frame):
@@ -14,18 +14,17 @@ class RecordPage(tk.Frame):
         Manages the record page.
     """
 
-    def __init__(self, root: tk.Frame, academic_record: AcademicRecord) -> None:
+    def __init__(self, root: tk.Frame) -> None:
         """
             Initialises the record page.
 
             Args:
                 root (tk.Frame): the main contents frame.
-                academic_record (AcademicRecord): the academic record of the student.
         """
 
-        # initialises the frame and sets academic record
+        # initialises the frame and initialises record
         super().__init__(root)
-        self.academic_record = academic_record
+        self.record = Record()
 
         # sets frame to hold table
         table_frame = tk.Frame(self, width=500, height=235)
@@ -99,10 +98,10 @@ class RecordPage(tk.Frame):
         tk.Button(control_frame, text="Add Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
         self.remove_unit_btn = tk.Button(control_frame, text="Remove Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.remove_unit())
         self.remove_unit_btn.pack(side="left", expand=True, fill="both", padx=10)
-        self.save_record_btn = tk.Button(control_frame, text="Save Record", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.save_record(), state="disabled")
-        self.save_record_btn.pack(side="left", expand=True, fill="both", padx=10)
-        self.reset_btn = tk.Button(control_frame, text="Reset", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.reset(), state="disabled")
-        self.reset_btn.pack(side="left", expand=True, fill="both", padx=10)
+        self.save_changes_btn = tk.Button(control_frame, text="Save Changes", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.save_changes(), state="disabled")
+        self.save_changes_btn.pack(side="left", expand=True, fill="both", padx=10)
+        self.discard_changes_btn = tk.Button(control_frame, text="Discard Changes", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.discard_changes(), state="disabled")
+        self.discard_changes_btn.pack(side="left", expand=True, fill="both", padx=10)
 
         # sets frame to hold results information
         results_frame = tk.Frame(self)
@@ -166,19 +165,19 @@ class RecordPage(tk.Frame):
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from academic record to table
-        for unit in self.academic_record.get_data():
+        # add units from record to table
+        for unit in self.record.get_data():
             self.table.insert("", "end", values=unit)
 
         # set wam and gpa
-        self.wam_lbl.config(text=self.academic_record.get_wam())
-        self.gpa_lbl.config(text=self.academic_record.get_gpa())
+        self.wam_lbl.config(text=self.record.get_wam())
+        self.gpa_lbl.config(text=self.record.get_gpa())
 
         # scrolls table all the way up
         children = self.table.get_children()
         if len(children) > 0:
             self.table.see(children[0])
-        
+
         # clears entry boxes
         self.unit_code.delete(0, tk.END)
         self.mark.delete(0, tk.END)
@@ -186,8 +185,12 @@ class RecordPage(tk.Frame):
         self.credit_pts.delete(0, tk.END)
 
         # disables remove unit button if there are no units
-        if len(self.academic_record.get_data()) == 0:
+        if len(self.record.get_data()) == 0:
             self.remove_unit_btn.config(state="disabled")
+
+        # enables remove unit button if there are units
+        else:
+            self.remove_unit_btn.config(state="normal")
 
         # resets focus
         self.focus.focus_set()
@@ -240,16 +243,16 @@ class RecordPage(tk.Frame):
         mark = str(mark)
         credit_pts = str(credit_pts)
 
-        # adds unit to the academic record and table
-        self.academic_record.add_unit([unit_code, mark, grade, credit_pts])
-        self.table.insert("", "end", values=self.academic_record.get_data()[-1])
+        # adds unit to the record and table
+        self.record.add_unit([unit_code, mark, grade, credit_pts])
+        self.table.insert("", "end", values=self.record.get_data()[-1])
 
         # scrolls table all the way down
         self.table.see(self.table.get_children()[-1])
 
         # updates wam and gpa
-        self.wam_lbl.config(text=self.academic_record.get_wam())
-        self.gpa_lbl.config(text=self.academic_record.get_gpa())
+        self.wam_lbl.config(text=self.record.get_wam())
+        self.gpa_lbl.config(text=self.record.get_gpa())
 
         # clears entry boxes
         self.unit_code.delete(0, tk.END)
@@ -257,10 +260,10 @@ class RecordPage(tk.Frame):
         self.grade.delete(0, tk.END)
         self.credit_pts.delete(0, tk.END)
 
-        # enables remove, save, and reset buttons
+        # enables remove, save, and discard buttons
         self.remove_unit_btn.config(state="normal")
-        self.save_record_btn.config(state="normal")
-        self.reset_btn.config(state="normal")
+        self.save_changes_btn.config(state="normal")
+        self.discard_changes_btn.config(state="normal")
 
         # resets focus
         self.focus.focus_set()
@@ -276,7 +279,7 @@ class RecordPage(tk.Frame):
             self.table.delete(rows[-1])
 
         # removes the last unit in the record
-        self.academic_record.remove_unit()
+        self.record.remove_unit()
 
         # scrolls table all the way down
         children = self.table.get_children()
@@ -284,63 +287,66 @@ class RecordPage(tk.Frame):
             self.table.see(children[-1])
 
         # updates wam and gpa
-        self.wam_lbl.config(text=self.academic_record.get_wam())
-        self.gpa_lbl.config(text=self.academic_record.get_gpa())
+        self.wam_lbl.config(text=self.record.get_wam())
+        self.gpa_lbl.config(text=self.record.get_gpa())
 
-        # enables save and reset buttons
-        self.save_record_btn.config(state="normal")
-        self.reset_btn.config(state="normal")
+        # enables save and discard buttons
+        self.save_changes_btn.config(state="normal")
+        self.discard_changes_btn.config(state="normal")
 
         # disables remove unit button if there are no units
-        if len(self.academic_record.get_data()) == 0:
+        if len(self.record.get_data()) == 0:
             self.remove_unit_btn.config(state="disabled")
 
         # resets focus
         self.focus.focus_set()
 
-    def save_record(self) -> None:
+    def save_changes(self) -> None:
         """
-            Saves the current record.
+            Saves the changes made to the record.
         """
+
+        # confirms that user wants to save changes
+        if not messagebox.askyesno("Save Changes", "Are you sure you want to save changes?"):
+
+            # cancels save changes action
+            messagebox.showinfo("Save Changes", "Action cancelled.")
+            return
 
         # saves the current record to file
-        self.academic_record.save_record()
+        self.record.save()
 
-        # clears entry boxes
-        self.unit_code.delete(0, tk.END)
-        self.mark.delete(0, tk.END)
-        self.grade.delete(0, tk.END)
-        self.credit_pts.delete(0, tk.END)
-
-        # disables save and reset buttons
-        self.save_record_btn.config(state="disabled")
-        self.reset_btn.config(state="disabled")
-
-        # resets focus
-        self.focus.focus_set()
-
-        # displays success message to user
-        messagebox.showinfo("Success", "Record saved successfully!")
-
-    def reset(self) -> None:
-        """
-            Resets the page and removes changes.
-        """
-
-        # resets the record data
-        self.academic_record.reset()
-
-        # disables save and reset buttons
-        self.save_record_btn.config(state="disabled")
-        self.reset_btn.config(state="disabled")
-
-        # disables remove unit button if there are no units
-        if len(self.academic_record.get_data()) == 0:
-            self.remove_unit_btn.config(state="disabled")
-
-        # enables remove unit button if there are units
-        else:
-            self.remove_unit_btn.config(state="normal")
+        # disables save and discard buttons
+        self.save_changes_btn.config(state="disabled")
+        self.discard_changes_btn.config(state="disabled")
 
         # reloads page
         self.load_page()
+
+        # displays success message to user
+        messagebox.showinfo("Save Changes", "Changes saved.")
+
+    def discard_changes(self) -> None:
+        """
+            Discard the changes made to the record.
+        """
+
+        # confirms that user wants to discard changes
+        if not messagebox.askyesno("Discard Changes", "Are you sure you want to discard changes?"):
+
+            # cancels discard changes action
+            messagebox.showinfo("Discard Changes", "Action cancelled.")
+            return
+
+        # resets the record data
+        self.record.reset()
+
+        # disables save and discard buttons
+        self.save_changes_btn.config(state="disabled")
+        self.discard_changes_btn.config(state="disabled")
+
+        # reloads page
+        self.load_page()
+
+        # displays success message to user
+        messagebox.showinfo("Discard Changes", "Changes discarded.")
