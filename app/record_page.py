@@ -230,7 +230,7 @@ class RecordPage(tk.Frame):
         # validates credit points
         try:
             credit_pts = int(credit_pts)
-            if credit_pts < 0 or credit_pts > 24:
+            if credit_pts < 1 or credit_pts > 24:
                 raise ValueError
         except ValueError:
             messagebox.showerror("Input Error", "Credit points is invalid.")
@@ -306,6 +306,12 @@ class RecordPage(tk.Frame):
         # saves the current record to file
         self.academic_record.save_record()
 
+        # clears entry boxes
+        self.unit_code.delete(0, tk.END)
+        self.mark.delete(0, tk.END)
+        self.grade.delete(0, tk.END)
+        self.credit_pts.delete(0, tk.END)
+
         # disables save and reset buttons
         self.save_record_btn.config(state="disabled")
         self.reset_btn.config(state="disabled")
@@ -331,6 +337,10 @@ class RecordPage(tk.Frame):
         # disables remove unit button if there are no units
         if len(self.academic_record.get_data()) == 0:
             self.remove_unit_btn.config(state="disabled")
+
+        # enables remove unit button if there are units
+        else:
+            self.remove_unit_btn.config(state="normal")
 
         # reloads page
         self.load_page()
