@@ -163,7 +163,7 @@ class WAMPage(tk.Frame):
         # add units from wam record data to table
         for unit in self.wam.get_record():
             self.table.insert("", "end", values=unit, tags=("current",))
-        
+
         # add units from wam extra data to table
         for unit in self.wam.get_data():
             self.table.insert("", "end", values=unit)
