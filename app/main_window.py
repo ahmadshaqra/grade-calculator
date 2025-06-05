@@ -36,7 +36,7 @@ class MainWindow(tk.Tk):
 
         # calculates desired window position
         x = (screen_width // 2) - (window_width // 2)
-        y = (screen_height // 2) - (window_height // 2) - 25
+        y = (screen_height // 2) - (window_height // 2) - 30
 
         # sets window size and position and disables resizing
         self.geometry(f"{window_width}x{window_height}+{x}+{y}")
