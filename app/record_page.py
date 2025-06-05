@@ -124,7 +124,7 @@ class RecordPage(tk.Frame):
 
     def on_enter(self, event: tk.Event) -> None:
         """
-            Enables user to add unit by pressing enter.
+            Allows user to add unit by pressing enter.
 
             Args:
                 event (tk.Event): a user input event.

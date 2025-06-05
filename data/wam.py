@@ -42,9 +42,9 @@ class WAM:
         # returns the data array
         return self.data
 
-    def get_wam(self) -> str:
+    def get_current_wam(self) -> str:
         """
-            Calculates and returns the WAM.
+            Calculates and returns the current WAM.
 
             Returns:
                 str: the WAM rounded to 3 decimal places.
@@ -55,10 +55,40 @@ class WAM:
         weighted_credits = 0
 
         # iterates through each unit in the record
-        for _, unit_code, mark, credit_pts in self.record + self.data:
+        for _, year_level, mark, credit_pts in self.record:
 
             # gets weighting of unit
-            weight = 0.5 if unit_code[3] == '1' else 1.0
+            weight = 0.5 if year_level == '1' else 1.0
+
+            # adds unit weighted marks and credits to totals
+            weighted_marks += int(mark) * int(credit_pts) * weight
+            weighted_credits += int(credit_pts) * weight
+
+        # checks if there are no units in the record
+        if weighted_credits == 0:
+            return "00.000"
+
+        # calculates and returns wam rounded to 3 decimal places
+        wam = weighted_marks / weighted_credits
+        return f"{wam:06.3f}"
+
+    def get_calculated_wam(self) -> str:
+        """
+            Calculates and returns the WAM with extra data.
+
+            Returns:
+                str: the WAM rounded to 3 decimal places.
+        """
+
+        # initialises total weighted marks and credits
+        weighted_marks = 0
+        weighted_credits = 0
+
+        # iterates through each unit in the record
+        for _, year_level, mark, credit_pts in self.record + self.data:
+
+            # gets weighting of unit
+            weight = 0.5 if year_level == '1' else 1.0
 
             # adds unit weighted marks and credits to totals
             weighted_marks += int(mark) * int(credit_pts) * weight
