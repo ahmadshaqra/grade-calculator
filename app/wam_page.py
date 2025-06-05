@@ -70,9 +70,9 @@ class WAMPage(tk.Frame):
 
         # adds year level label and entry box
         tk.Label(add_unit_frame, text="Year Level: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.year_level = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.year_level.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.year_level.bind("<Return>", self.on_enter)
+        self.year_lvl = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
+        self.year_lvl.pack(side="left", expand=True, fill="both", padx=(0,10))
+        self.year_lvl.bind("<Return>", self.on_enter)
 
         # adds mark label and entry box
         tk.Label(add_unit_frame, text="Mark: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
@@ -178,7 +178,7 @@ class WAMPage(tk.Frame):
             self.table.see(children[0])
 
         # clears entry boxes
-        self.year_level.delete(0, tk.END)
+        self.year_lvl.delete(0, tk.END)
         self.mark.delete(0, tk.END)
         self.credit_pts.delete(0, tk.END)
 
@@ -199,19 +199,19 @@ class WAMPage(tk.Frame):
         """
 
         # gets all the unit details from entry boxes
-        year_level = self.year_level.get()
+        year_lvl = self.year_lvl.get()
         mark = self.mark.get()
         credit_pts = self.credit_pts.get()
 
         # validates year level
         try:
-            year_level = int(year_level)
-            if year_level < 1 or year_level > 9:
+            year_lvl = int(year_lvl)
+            if year_lvl < 1 or year_lvl > 9:
                 raise ValueError
         except ValueError:
             messagebox.showerror("Input Error", "Year level is invalid.")
             return
-        year_level = str(year_level)
+        year_lvl = str(year_lvl)
 
         # validates mark
         try:
@@ -234,7 +234,7 @@ class WAMPage(tk.Frame):
         credit_pts = str(credit_pts)
 
         # adds unit to the wam data and table
-        self.wam.add_unit([year_level, mark, credit_pts])
+        self.wam.add_unit([year_lvl, mark, credit_pts])
         self.table.insert("", "end", values=self.wam.get_data()[-1])
 
         # scrolls table all the way down
@@ -244,7 +244,7 @@ class WAMPage(tk.Frame):
         self.calculated_wam_lbl.config(text=self.wam.get_calculated_wam())
 
         # clears entry boxes
-        self.year_level.delete(0, tk.END)
+        self.year_lvl.delete(0, tk.END)
         self.mark.delete(0, tk.END)
         self.credit_pts.delete(0, tk.END)
 

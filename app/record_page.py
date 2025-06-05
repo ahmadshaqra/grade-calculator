@@ -36,6 +36,7 @@ class RecordPage(tk.Frame):
         style.theme_use("alt")
         style.configure("Treeview", font=("Segoe UI", 10))
         style.configure("Treeview.Heading", background="lightgrey", font=("Segoe UI", 10, "bold"))
+        style.map("Treeview", background=[("selected", "lightgrey")], foreground=[("selected", "black")])
         style.map("Treeview.Heading", background=[("!active", "lightgrey"), ("active", "lightgrey"), ("pressed", "lightgrey")])
 
         # sets columns of the table
@@ -50,8 +51,8 @@ class RecordPage(tk.Frame):
             self.table.heading(column, text=column)
             self.table.column(column, anchor="center", width=self.column_width, minwidth=self.column_width, stretch=False)
 
-        # disabling row selection and column size change
-        self.table.bind("<<TreeviewSelect>>", self.disable_row_selection)
+        # binding row selection and column size change actions
+        self.table.bind("<Button-1>", self.select_row)
         self.table.bind("<ButtonRelease-1>", self.lock_column_sizes)
 
         # initialises scrollbar for the table
@@ -133,16 +134,40 @@ class RecordPage(tk.Frame):
         # calls add unit function
         self.add_unit()
 
-    def disable_row_selection(self, event: tk.Event) -> None:
+    def select_row(self, event: tk.Event) -> None:
         """
-            Disables row selection by user.
+            Handles a select row action.
 
             Args:
                 event (tk.Event): a user input event.
         """
 
-        # removes the selection from row
-        self.table.selection_remove(self.table.selection())
+        # gets the row id of the event
+        row = self.table.identify_row(event.y)
+
+        # clicked on empty space
+        if not row:
+
+            # clears selection and disables remove unit button
+            self.table.selection_remove(self.table.selection())
+            self.remove_unit_btn.config(state="disabled")
+
+        # clicked row is already selected
+        elif row in self.table.selection():
+
+            # removes the selection and disables remove unit button
+            self.table.selection_remove(row)
+            self.remove_unit_btn.config(state="disabled")
+
+        # clicked row is not selected
+        else:
+
+            # sets the selection and enables remove unit button
+            self.table.selection_set(row)
+            self.remove_unit_btn.config(state="normal")
+
+        # stops default behaviour
+        return "break"
 
     def lock_column_sizes(self, event: tk.Event) -> None:
         """
@@ -184,13 +209,8 @@ class RecordPage(tk.Frame):
         self.grade.delete(0, tk.END)
         self.credit_pts.delete(0, tk.END)
 
-        # disables remove unit button if there are no units
-        if len(self.record.get_data()) == 0:
-            self.remove_unit_btn.config(state="disabled")
-
-        # enables remove unit button if there are units
-        else:
-            self.remove_unit_btn.config(state="normal")
+        # disables remove unit button
+        self.remove_unit_btn.config(state="disabled")
 
         # resets focus
         self.focus.focus_set()
@@ -273,30 +293,33 @@ class RecordPage(tk.Frame):
             Removes the last unit.
         """
 
-        # deletes the last row of the table
-        rows = self.table.get_children()
-        if len(rows) > 0:
-            self.table.delete(rows[-1])
+        # gets the selected row and unit number
+        row = self.table.selection()
+        unit_no = int(self.table.item(row[0])["values"][0])
+ 
+        # scrolls table view to selected row
+        self.table.see(row)
 
-        # removes the last unit in the record
-        self.record.remove_unit()
-
-        # scrolls table all the way down
-        children = self.table.get_children()
-        if len(children) > 0:
-            self.table.see(children[-1])
+        # deletes the selected unit from table and record
+        self.table.delete(row)
+        self.record.remove_unit(unit_no)
 
         # updates wam and gpa
         self.wam_lbl.config(text=self.record.get_wam())
         self.gpa_lbl.config(text=self.record.get_gpa())
 
-        # enables save and discard buttons
+        # enables save and discard buttons and disables remove unit button
         self.save_changes_btn.config(state="normal")
         self.discard_changes_btn.config(state="normal")
+        self.remove_unit_btn.config(state="disabled")
 
-        # disables remove unit button if there are no units
-        if len(self.record.get_data()) == 0:
-            self.remove_unit_btn.config(state="disabled")
+        # clear current table
+        for row in self.table.get_children():
+            self.table.delete(row)
+
+        # add units from record to table
+        for unit in self.record.get_data():
+            self.table.insert("", "end", values=unit)
 
         # resets focus
         self.focus.focus_set()

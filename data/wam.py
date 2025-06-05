@@ -17,7 +17,7 @@ class WAM:
         """
 
         # gets data from files
-        self.record = [[unit_no, unit_code[3], mark, credit_pts] for unit_no, unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
+        self.record = [[unit_code[3], mark, credit_pts] for _, unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
         self.data = FileManager.read_file("wam.txt")
 
     def get_record(self) -> list[list[str]]:
@@ -29,7 +29,7 @@ class WAM:
         """
 
         # returns the record array
-        return self.record
+        return [[i + 1] + self.record[i] for i in range(len(self.record))]
 
     def get_data(self) -> list[list[str]]:
         """
@@ -40,7 +40,7 @@ class WAM:
         """
 
         # returns the data array
-        return self.data
+        return [[i + len(self.record) + 1] + self.data[i] for i in range(len(self.data))]
 
     def get_current_wam(self) -> str:
         """
@@ -55,10 +55,10 @@ class WAM:
         weighted_credits = 0
 
         # iterates through each unit in the record
-        for _, year_level, mark, credit_pts in self.record:
+        for year_lvl, mark, credit_pts in self.record:
 
             # gets weighting of unit
-            weight = 0.5 if year_level == '1' else 1.0
+            weight = 0.5 if year_lvl == '1' else 1.0
 
             # adds unit weighted marks and credits to totals
             weighted_marks += int(mark) * int(credit_pts) * weight
@@ -85,10 +85,10 @@ class WAM:
         weighted_credits = 0
 
         # iterates through each unit in the record
-        for _, year_level, mark, credit_pts in self.record + self.data:
+        for year_lvl, mark, credit_pts in self.record + self.data:
 
             # gets weighting of unit
-            weight = 0.5 if year_level == '1' else 1.0
+            weight = 0.5 if year_lvl == '1' else 1.0
 
             # adds unit weighted marks and credits to totals
             weighted_marks += int(mark) * int(credit_pts) * weight
@@ -111,7 +111,7 @@ class WAM:
         """
 
         # appends the unit to the data array
-        self.data.append([str(len(self.record) + len(self.data) + 1)] + unit)
+        self.data.append(unit)
 
         # saves data to file
         FileManager.write_file("wam.txt", self.data)
@@ -136,5 +136,5 @@ class WAM:
         """
 
         # gets data from files
-        self.record = [[unit_no, unit_code[3], mark, credit_pts] for unit_no, unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
+        self.record = [[unit_code[3], mark, credit_pts] for _, unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
         self.data = FileManager.read_file("wam.txt")

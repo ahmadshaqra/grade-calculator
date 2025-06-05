@@ -113,16 +113,20 @@ class Record:
         # appends the unit to the data array
         self.data.append([str(len(self.data) + 1)] + unit)
 
-    def remove_unit(self) -> None:
+    def remove_unit(self, unit_no: int) -> None:
         """
-            Removes the last unit in the record.
+            Removes a unit in the record.
+
+            Args:
+                unit_no (int): the unit to delete.
         """
 
-        # checks if there are units in the data array
-        if len(self.data) > 0:
+        # deletes unit from data
+        self.data.pop(unit_no - 1)
 
-            # removes the last unit from the data array
-            self.data.pop()
+        # shifts all unit numbers after deleted unit
+        for i in range(unit_no - 1, len(self.data)):
+            self.data[i][0] = str(i + 1)
 
     def save(self) -> None:
         """
