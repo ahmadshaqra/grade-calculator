@@ -1,7 +1,7 @@
 """
     record.py
 
-    Contains an record class.
+    Contains the record class.
 """
 
 from utils.file_manager import FileManager
