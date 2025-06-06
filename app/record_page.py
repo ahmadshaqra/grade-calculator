@@ -51,9 +51,10 @@ class RecordPage(tk.Frame):
             self.table.heading(column, text=column)
             self.table.column(column, anchor="center", width=self.column_width, minwidth=self.column_width, stretch=False)
 
-        # binding row selection and column size change actions
+        # binds keyboard and mouse actions
         self.table.bind("<Button-1>", self.select_row)
         self.table.bind("<ButtonRelease-1>", self.lock_column_sizes)
+        self.table.bind("<BackSpace>", self.on_backspace)
 
         # initialises scrollbar for the table
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.table.yview)
@@ -97,12 +98,7 @@ class RecordPage(tk.Frame):
 
         # adds the control buttons
         tk.Button(control_frame, text="Add Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
-        self.remove_unit_btn = tk.Button(control_frame, text="Remove Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.remove_unit())
-        self.remove_unit_btn.pack(side="left", expand=True, fill="both", padx=10)
-        self.save_changes_btn = tk.Button(control_frame, text="Save Changes", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.save_changes(), state="disabled")
-        self.save_changes_btn.pack(side="left", expand=True, fill="both", padx=10)
-        self.discard_changes_btn = tk.Button(control_frame, text="Discard Changes", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.discard_changes(), state="disabled")
-        self.discard_changes_btn.pack(side="left", expand=True, fill="both", padx=10)
+        tk.Button(control_frame, text="Remove Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.remove_unit()).pack(side="left", expand=True, fill="both", padx=10)
 
         # sets frame to hold results information
         results_frame = tk.Frame(self)
@@ -118,11 +114,6 @@ class RecordPage(tk.Frame):
         self.gpa_lbl = tk.Label(results_frame, text="0.000", font=("Segoe UI", 10))
         self.gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
-        # creates a hidden focus point
-        self.focus = tk.Canvas(self, width=0, height=0, highlightthickness=0)
-        self.focus.pack()
-        self.focus.focus_set()
-
     def on_enter(self, event: tk.Event) -> None:
         """
             Allows user to add unit by pressing enter.
@@ -133,6 +124,20 @@ class RecordPage(tk.Frame):
 
         # calls add unit function
         self.add_unit()
+
+    def on_backspace(self, event: tk.Event) -> None:
+        """
+            Allows user to remove unit by pressing backspace.
+
+            Args:
+                event (tk.Event): a user input event.
+        """
+
+        # checks if a unit is selected
+        if self.table.selection():
+
+            # calls remove unit function
+            self.remove_unit()
 
     def select_row(self, event: tk.Event) -> None:
         """
@@ -145,26 +150,20 @@ class RecordPage(tk.Frame):
         # gets the row id of the event
         row = self.table.identify_row(event.y)
 
-        # clicked on empty space
-        if not row:
+        # clicked on an unselected row
+        if row and row not in self.table.selection():
 
-            # clears selection and disables remove unit button
-            self.table.selection_remove(self.table.selection())
-            self.remove_unit_btn.config(state="disabled")
+            # sets the selection
+            self.table.selection_set(row)
 
-        # clicked row is already selected
-        elif row in self.table.selection():
-
-            # removes the selection and disables remove unit button
-            self.table.selection_remove(row)
-            self.remove_unit_btn.config(state="disabled")
-
-        # clicked row is not selected
+        # clicked on empty space or selected row
         else:
 
-            # sets the selection and enables remove unit button
-            self.table.selection_set(row)
-            self.remove_unit_btn.config(state="normal")
+            # clears selection
+            self.table.selection_remove(self.table.selection())
+
+        # sets focus to the table
+        self.table.focus_set()
 
         # stops default behaviour
         return "break"
@@ -209,16 +208,42 @@ class RecordPage(tk.Frame):
         self.grade.delete(0, tk.END)
         self.credit_pts.delete(0, tk.END)
 
-        # disables remove unit button
-        self.remove_unit_btn.config(state="disabled")
-
         # resets focus
-        self.focus.focus_set()
+        self.table.focus_set()
 
     def add_unit(self) -> None:
         """
             Adds a unit to the record.
         """
+
+        add_unit_form = tk.Toplevel(self)
+        add_unit_form.title("Add Unit")
+
+        # tk.Label(add_unit_form, text="", font=("Segoe UI", 10, "bold")).pack(pady=10)
+
+        # # adds unit code label and entry box
+        # tk.Label(add_unit_form, text="Unit Code: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
+        # self.unit_code = tk.Entry(add_unit_form, width=10, font=("Segoe UI", 10))
+        # self.unit_code.pack(side="left", expand=True, fill="both", padx=(0,10))
+        # self.unit_code.bind("<Return>", self.on_enter)
+
+        # # adds mark label and entry box
+        # tk.Label(add_unit_form, text="Mark: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
+        # self.mark = tk.Entry(add_unit_form, width=5, font=("Segoe UI", 10))
+        # self.mark.pack(side="left", expand=True, fill="both", padx=(0,10))
+        # self.mark.bind("<Return>", self.on_enter)
+
+        # # adds grade label and entry box
+        # tk.Label(add_unit_form, text="Grade: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
+        # self.grade = tk.Entry(add_unit_form, width=5, font=("Segoe UI", 10))
+        # self.grade.pack(side="left", expand=True, fill="both", padx=(0,10))
+        # self.grade.bind("<Return>", self.on_enter)
+
+        # # adds credit points label and entry box
+        # tk.Label(add_unit_form, text="Credit Points: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
+        # self.credit_pts = tk.Entry(add_unit_form, width=5, font=("Segoe UI", 10))
+        # self.credit_pts.pack(side="left", expand=True, fill="both", padx=(0,10))
+        # self.credit_pts.bind("<Return>", self.on_enter)
 
         # gets all the unit details from entry boxes
         unit_code = self.unit_code.get().upper()
@@ -280,23 +305,34 @@ class RecordPage(tk.Frame):
         self.grade.delete(0, tk.END)
         self.credit_pts.delete(0, tk.END)
 
-        # enables remove, save, and discard buttons
-        self.remove_unit_btn.config(state="normal")
-        self.save_changes_btn.config(state="normal")
-        self.discard_changes_btn.config(state="normal")
-
         # resets focus
-        self.focus.focus_set()
+        self.table.focus_set()
 
     def remove_unit(self) -> None:
         """
-            Removes the last unit.
+            Removes the selected unit.
         """
 
-        # gets the selected row and unit number
+        # gets the selected row
         row = self.table.selection()
-        unit_no = int(self.table.item(row[0])["values"][0])
+
+        # checks if no unit is selected
+        if not row:
+            messagebox.showerror("Remove Unit", "Select a unit to remove.")
+            return
+
+        # gets unit details
+        unit = self.table.item(row[0])["values"]
+        unit_no = int(unit[0])
+        unit_code = unit[1]
  
+        # confirms that user wants to save changes
+        if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove {unit_code}?"):
+
+            # cancels save changes action
+            messagebox.showinfo("Remove Unit", "Action cancelled.")
+            return
+
         # scrolls table view to selected row
         self.table.see(row)
 
@@ -308,11 +344,6 @@ class RecordPage(tk.Frame):
         self.wam_lbl.config(text=self.record.get_wam())
         self.gpa_lbl.config(text=self.record.get_gpa())
 
-        # enables save and discard buttons and disables remove unit button
-        self.save_changes_btn.config(state="normal")
-        self.discard_changes_btn.config(state="normal")
-        self.remove_unit_btn.config(state="disabled")
-
         # clear current table
         for row in self.table.get_children():
             self.table.delete(row)
@@ -322,54 +353,7 @@ class RecordPage(tk.Frame):
             self.table.insert("", "end", values=unit)
 
         # resets focus
-        self.focus.focus_set()
-
-    def save_changes(self) -> None:
-        """
-            Saves the changes made to the record.
-        """
-
-        # confirms that user wants to save changes
-        if not messagebox.askyesno("Save Changes", "Are you sure you want to save changes?"):
-
-            # cancels save changes action
-            messagebox.showinfo("Save Changes", "Action cancelled.")
-            return
-
-        # saves the current record to file
-        self.record.save()
-
-        # disables save and discard buttons
-        self.save_changes_btn.config(state="disabled")
-        self.discard_changes_btn.config(state="disabled")
-
-        # reloads page
-        self.load_page()
+        self.table.focus_set()
 
         # displays success message to user
-        messagebox.showinfo("Save Changes", "Changes saved.")
-
-    def discard_changes(self) -> None:
-        """
-            Discard the changes made to the record.
-        """
-
-        # confirms that user wants to discard changes
-        if not messagebox.askyesno("Discard Changes", "Are you sure you want to discard changes?"):
-
-            # cancels discard changes action
-            messagebox.showinfo("Discard Changes", "Action cancelled.")
-            return
-
-        # resets the record data
-        self.record.reset()
-
-        # disables save and discard buttons
-        self.save_changes_btn.config(state="disabled")
-        self.discard_changes_btn.config(state="disabled")
-
-        # reloads page
-        self.load_page()
-
-        # displays success message to user
-        messagebox.showinfo("Discard Changes", "Changes discarded.")
+        messagebox.showinfo("Remove Unit", f"{unit_code} removed.")

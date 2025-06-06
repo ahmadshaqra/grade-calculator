@@ -17,7 +17,7 @@ class GPA:
         """
 
         # gets data from files
-        self.record = [[grade, credit_pts] for _, _, _, grade, credit_pts in FileManager.read_file("record.txt")]
+        self.record = [[grade, credit_pts] for _, _, grade, credit_pts in FileManager.read_file("record.txt")]
         self.data = FileManager.read_file("gpa.txt")
 
     def get_record(self) -> list[list[str]]:
@@ -160,5 +160,5 @@ class GPA:
         """
 
         # gets data from files
-        self.record = [[grade, credit_pts] for _, _, _, grade, credit_pts in FileManager.read_file("record.txt")]
+        self.record = [[grade, credit_pts] for _, _, grade, credit_pts in FileManager.read_file("record.txt")]
         self.data = FileManager.read_file("gpa.txt")

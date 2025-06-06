@@ -17,7 +17,7 @@ class WAM:
         """
 
         # gets data from files
-        self.record = [[unit_code[3], mark, credit_pts] for _, unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
+        self.record = [[unit_code[3], mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
         self.data = FileManager.read_file("wam.txt")
 
     def get_record(self) -> list[list[str]]:
@@ -136,5 +136,5 @@ class WAM:
         """
 
         # gets data from files
-        self.record = [[unit_code[3], mark, credit_pts] for _, unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
+        self.record = [[unit_code[3], mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
         self.data = FileManager.read_file("wam.txt")
