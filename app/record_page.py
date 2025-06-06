@@ -106,11 +106,8 @@ class RecordPage(tk.Frame):
                 event (tk.Event): a user input event.
         """
 
-        # checks if a unit is selected
-        if self.table.selection():
-
-            # calls remove unit function
-            self.remove_unit()
+        # calls remove unit function
+        self.remove_unit()
 
     def select_row(self, event: tk.Event) -> None:
         """
@@ -343,6 +340,9 @@ class RecordPage(tk.Frame):
         # resets focus
         self.table.focus_set()
 
+        # displays success message to user
+        messagebox.showinfo("Add Unit", f"{unit_code} added.")
+
     def remove_unit(self) -> None:
         """
             Removes the selected unit.
@@ -363,9 +363,6 @@ class RecordPage(tk.Frame):
  
         # confirms that user wants to save changes
         if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove {unit_code}?"):
-
-            # cancels save changes action
-            messagebox.showinfo("Remove Unit", "Action cancelled.")
             return
 
         # scrolls table view to selected row
