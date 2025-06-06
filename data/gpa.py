@@ -17,7 +17,7 @@ class GPA:
         """
 
         # gets data from files
-        self.record = [[unit_no, grade, credit_pts] for unit_no, _, _, grade, credit_pts in FileManager.read_file("record.txt")]
+        self.record = [[grade, credit_pts] for _, _, grade, credit_pts in FileManager.read_file("record.txt")]
         self.data = FileManager.read_file("gpa.txt")
 
     def get_record(self) -> list[list[str]]:
@@ -29,7 +29,7 @@ class GPA:
         """
 
         # returns the record array
-        return self.record
+        return [[i + 1] + self.record[i] for i in range(len(self.record))]
 
     def get_data(self) -> list[list[str]]:
         """
@@ -40,7 +40,7 @@ class GPA:
         """
 
         # returns the data array
-        return self.data
+        return [[i + len(self.record) + 1] + self.data[i] for i in range(len(self.data))]
 
     def get_current_gpa(self) -> str:
         """
@@ -55,7 +55,7 @@ class GPA:
         total_credits = 0
 
         # iterates through each unit in the record
-        for _, grade, credit_pts in self.record:
+        for grade, credit_pts in self.record:
 
             # gets grade value
             match grade:
@@ -97,7 +97,7 @@ class GPA:
         total_credits = 0
 
         # iterates through each unit in the record
-        for _, grade, credit_pts in self.record + self.data:
+        for grade, credit_pts in self.record + self.data:
 
             # gets grade value
             match grade:
@@ -135,7 +135,7 @@ class GPA:
         """
 
         # appends the unit to the data array
-        self.data.append([str(len(self.record) + len(self.data) + 1)] + unit)
+        self.data.append(unit)
 
         # saves data to file
         FileManager.write_file("gpa.txt", self.data)
@@ -160,5 +160,5 @@ class GPA:
         """
 
         # gets data from files
-        self.record = [[unit_no, grade, credit_pts] for unit_no, _, _, grade, credit_pts in FileManager.read_file("record.txt")]
+        self.record = [[grade, credit_pts] for _, _, grade, credit_pts in FileManager.read_file("record.txt")]
         self.data = FileManager.read_file("gpa.txt")

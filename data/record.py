@@ -28,7 +28,7 @@ class Record:
         """
 
         # returns the data array
-        return self.data
+        return [[i + 1] + self.data[i] for i in range(len(self.data))]
 
     def get_wam(self) -> str:
         """
@@ -43,7 +43,7 @@ class Record:
         weighted_credits = 0
 
         # iterates through each unit in the record
-        for _, unit_code, mark, _, credit_pts in self.data:
+        for unit_code, mark, _, credit_pts in self.data:
 
             # gets weighting of unit
             weight = 0.5 if unit_code[3] == '1' else 1.0
@@ -73,7 +73,7 @@ class Record:
         total_credits = 0
 
         # iterates through each unit in the record
-        for _, _, _, grade, credit_pts in self.data:
+        for _, _, grade, credit_pts in self.data:
 
             # gets grade value
             match grade:
@@ -111,31 +111,21 @@ class Record:
         """
 
         # appends the unit to the data array
-        self.data.append([str(len(self.data) + 1)] + unit)
-
-    def remove_unit(self) -> None:
-        """
-            Removes the last unit in the record.
-        """
-
-        # checks if there are units in the data array
-        if len(self.data) > 0:
-
-            # removes the last unit from the data array
-            self.data.pop()
-
-    def save(self) -> None:
-        """
-            Saves the record to file.
-        """
+        self.data.append(unit)
 
         # writes data to file
         FileManager.write_file("record.txt", self.data)
 
-    def reset(self) -> None:
+    def remove_unit(self, unit_no: int) -> None:
         """
-            Reinitialises the record from file.
+            Removes a unit in the record.
+
+            Args:
+                unit_no (int): the unit to delete.
         """
 
-        # gets data from file
-        self.data = FileManager.read_file("record.txt")
+        # deletes unit from data
+        self.data.pop(unit_no - 1)
+
+        # writes data to file
+        FileManager.write_file("record.txt", self.data)

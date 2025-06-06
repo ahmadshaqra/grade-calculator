@@ -27,7 +27,7 @@ class RecordPage(tk.Frame):
         self.record = Record()
 
         # sets frame to hold table
-        table_frame = tk.Frame(self, width=500, height=235)
+        table_frame = tk.Frame(self, width=500, height=275)
         table_frame.pack()
         table_frame.grid_propagate(False)
 
@@ -36,6 +36,7 @@ class RecordPage(tk.Frame):
         style.theme_use("alt")
         style.configure("Treeview", font=("Segoe UI", 10))
         style.configure("Treeview.Heading", background="lightgrey", font=("Segoe UI", 10, "bold"))
+        style.map("Treeview", background=[("selected", "lightgrey")], foreground=[("selected", "black")])
         style.map("Treeview.Heading", background=[("!active", "lightgrey"), ("active", "lightgrey"), ("pressed", "lightgrey")])
 
         # sets columns of the table
@@ -43,16 +44,17 @@ class RecordPage(tk.Frame):
         self.column_width = 96
 
         # initialises table
-        self.table = ttk.Treeview(table_frame, columns=self.columns, show="headings", height=10)
+        self.table = ttk.Treeview(table_frame, columns=self.columns, show="headings", height=12)
 
         # adds columns to the table
         for column in self.columns:
             self.table.heading(column, text=column)
             self.table.column(column, anchor="center", width=self.column_width, minwidth=self.column_width, stretch=False)
 
-        # disabling row selection and column size change
-        self.table.bind("<<TreeviewSelect>>", self.disable_row_selection)
-        self.table.bind("<ButtonRelease-1>", self.lock_column_sizes)
+        # binds keyboard and mouse actions
+        self.table.bind("<Button-1>", self.select_row)
+        self.table.bind("<BackSpace>", self.on_backspace)
+        self.table.bind("<Return>", self.on_enter)
 
         # initialises scrollbar for the table
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.table.yview)
@@ -62,46 +64,13 @@ class RecordPage(tk.Frame):
         self.table.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
 
-        # sets frame to hold add unit entry boxes
-        add_unit_frame = tk.Frame(self)
-        add_unit_frame.pack(pady=10)
-
-        # adds unit code label and entry box
-        tk.Label(add_unit_frame, text="Unit Code: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.unit_code = tk.Entry(add_unit_frame, width=10, font=("Segoe UI", 10))
-        self.unit_code.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.unit_code.bind("<Return>", self.on_enter)
-
-        # adds mark label and entry box
-        tk.Label(add_unit_frame, text="Mark: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.mark = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.mark.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.mark.bind("<Return>", self.on_enter)
-
-        # adds grade label and entry box
-        tk.Label(add_unit_frame, text="Grade: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.grade = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.grade.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.grade.bind("<Return>", self.on_enter)
-
-        # adds credit points label and entry box
-        tk.Label(add_unit_frame, text="Credit Points: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.credit_pts = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.credit_pts.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.credit_pts.bind("<Return>", self.on_enter)
-
         # sets frame to hold control buttons
         control_frame = tk.Frame(self)
         control_frame.pack(pady=10)
 
         # adds the control buttons
-        tk.Button(control_frame, text="Add Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
-        self.remove_unit_btn = tk.Button(control_frame, text="Remove Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.remove_unit())
-        self.remove_unit_btn.pack(side="left", expand=True, fill="both", padx=10)
-        self.save_changes_btn = tk.Button(control_frame, text="Save Changes", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.save_changes(), state="disabled")
-        self.save_changes_btn.pack(side="left", expand=True, fill="both", padx=10)
-        self.discard_changes_btn = tk.Button(control_frame, text="Discard Changes", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.discard_changes(), state="disabled")
-        self.discard_changes_btn.pack(side="left", expand=True, fill="both", padx=10)
+        tk.Button(control_frame, text="Add Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit_form()).pack(side="left", expand=True, fill="both", padx=10)
+        tk.Button(control_frame, text="Remove Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.remove_unit()).pack(side="left", expand=True, fill="both", padx=10)
 
         # sets frame to hold results information
         results_frame = tk.Frame(self)
@@ -117,44 +86,59 @@ class RecordPage(tk.Frame):
         self.gpa_lbl = tk.Label(results_frame, text="0.000", font=("Segoe UI", 10))
         self.gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
-        # creates a hidden focus point
-        self.focus = tk.Canvas(self, width=0, height=0, highlightthickness=0)
-        self.focus.pack()
-        self.focus.focus_set()
+        # initialises add unit window pointer
+        self.add_unit_window = None
 
     def on_enter(self, event: tk.Event) -> None:
         """
-            Allows user to add unit by pressing enter.
+            Allows user to open add unit form by pressing enter.
 
             Args:
                 event (tk.Event): a user input event.
         """
 
-        # calls add unit function
-        self.add_unit()
+        # calls add unit form function
+        self.add_unit_form()
 
-    def disable_row_selection(self, event: tk.Event) -> None:
+    def on_backspace(self, event: tk.Event) -> None:
         """
-            Disables row selection by user.
+            Allows user to remove unit by pressing backspace.
 
             Args:
                 event (tk.Event): a user input event.
         """
 
-        # removes the selection from row
-        self.table.selection_remove(self.table.selection())
+        # calls remove unit function
+        self.remove_unit()
 
-    def lock_column_sizes(self, event: tk.Event) -> None:
+    def select_row(self, event: tk.Event) -> None:
         """
-            Locks column resizing by user.
+            Handles a select row action.
 
             Args:
                 event (tk.Event): a user input event.
         """
 
-        # sets all columns to the fixed width
-        for column in self.columns:
-            self.table.column(column, width=self.column_width)
+        # gets the row id of the event
+        row = self.table.identify_row(event.y)
+
+        # clicked on an unselected row
+        if row and row not in self.table.selection():
+
+            # sets the selection
+            self.table.selection_set(row)
+
+        # clicked on empty space or selected row
+        else:
+
+            # clears selection
+            self.table.selection_remove(self.table.selection())
+
+        # sets focus to the table
+        self.table.focus_set()
+
+        # stops default behaviour
+        return "break"
 
     def load_page(self) -> None:
         """
@@ -178,22 +162,126 @@ class RecordPage(tk.Frame):
         if len(children) > 0:
             self.table.see(children[0])
 
-        # clears entry boxes
-        self.unit_code.delete(0, tk.END)
-        self.mark.delete(0, tk.END)
-        self.grade.delete(0, tk.END)
-        self.credit_pts.delete(0, tk.END)
-
-        # disables remove unit button if there are no units
-        if len(self.record.get_data()) == 0:
-            self.remove_unit_btn.config(state="disabled")
-
-        # enables remove unit button if there are units
-        else:
-            self.remove_unit_btn.config(state="normal")
-
         # resets focus
-        self.focus.focus_set()
+        self.table.focus_set()
+
+    def add_unit_form(self) -> None:
+        """
+            Creates the add unit form.
+        """
+
+        # checks if add unit form already exists
+        if self.add_unit_window is None or not self.add_unit_window.winfo_exists():
+
+            # creates the add unit window
+            self.add_unit_window = tk.Toplevel(self)
+
+            # sets close protocol
+            self.add_unit_window.protocol("WM_DELETE_WINDOW", self.on_close_add_unit_form)
+
+            # sets title
+            self.add_unit_window.title("Add Unit")
+
+            # sets the window dimensions
+            window_width = 400
+            window_height = 270
+
+            # gets the screen dimensions
+            screen_width = self.add_unit_window.winfo_screenwidth()
+            screen_height = self.add_unit_window.winfo_screenheight()
+
+            # calculates desired window position
+            x = (screen_width // 2) - (window_width // 2)
+            y = (screen_height // 2) - (window_height // 2) - 30
+
+            # sets window size and position and disables resizing
+            self.add_unit_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+            self.add_unit_window.resizable(False, False)
+
+            # adds title label
+            tk.Label(self.add_unit_window, text="Add Details for New Unit", font=("Segoe UI", 10, "bold")).pack(pady=10)
+
+            # sets entry frame
+            entry_frame = tk.Frame(self.add_unit_window)
+            entry_frame.pack(pady=0)
+
+            # sets left frame
+            left_frame = tk.Frame(entry_frame)
+            left_frame.pack(side="left", expand=True, fill="both", padx=5)
+
+            # sets right frame
+            right_frame = tk.Frame(entry_frame)
+            right_frame.pack(side="left", expand=True, fill="both", padx=5)
+
+            # creates and sets unit code frame, label, and entry box
+            unit_code_frame = tk.LabelFrame(left_frame, text="Unit Code", font=("Segoe UI", 10, "bold"))
+            unit_code_frame.pack(pady=5)
+            self.unit_code = tk.Entry(unit_code_frame, width=15, font=("Segoe UI", 10))
+            self.unit_code.pack(padx=10, pady=10)
+            self.unit_code.bind("<Return>", self.on_enter_add_unit_form)
+
+            # creates and sets mark frame, label, and entry box
+            mark_frame = tk.LabelFrame(left_frame, text="Mark", font=("Segoe UI", 10, "bold"))
+            mark_frame.pack(pady=5)
+            self.mark = tk.Entry(mark_frame, width=15, font=("Segoe UI", 10))
+            self.mark.pack(padx=10, pady=10)
+            self.mark.bind("<Return>", self.on_enter_add_unit_form)
+
+            # creates and sets grade frame, label, and entry box
+            grade_frame = tk.LabelFrame(right_frame, text="Grade", font=("Segoe UI", 10, "bold"))
+            grade_frame.pack(pady=5)
+            self.grade = tk.Entry(grade_frame, width=15, font=("Segoe UI", 10))
+            self.grade.pack(padx=10, pady=10)
+            self.grade.bind("<Return>", self.on_enter_add_unit_form)
+
+            # creates and sets credit points frame, label, and entry box
+            credit_pts_frame = tk.LabelFrame(right_frame, text="Credit Points", font=("Segoe UI", 10, "bold"))
+            credit_pts_frame.pack(pady=5)
+            self.credit_pts = tk.Entry(credit_pts_frame, width=15, font=("Segoe UI", 10))
+            self.credit_pts.pack(padx=10, pady=10)
+            self.credit_pts.bind("<Return>", self.on_enter_add_unit_form)
+
+            # set frame for control buttons
+            control_frame = tk.Frame(self.add_unit_window)
+            control_frame.pack(pady=10)
+
+            # adds control buttons
+            tk.Button(control_frame, text="Cancel", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit_window.destroy()).pack(side="left", expand=True, fill="both", padx=10)
+            tk.Button(control_frame, text="Add", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
+
+            # adds input error label
+            self.input_error_lbl = tk.Label(self.add_unit_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
+            self.input_error_lbl.pack(pady=5)
+
+        # add unit form already open
+        else:
+
+            # brings the form to the front
+            self.add_unit_window.deiconify()
+            self.add_unit_window.lift()
+
+        # sets focus on window
+        self.add_unit_window.focus_set()
+
+    def on_enter_add_unit_form(self, event: tk.Event) -> None:
+        """
+            Allows user to add unit by pressing enter.
+
+            Args:
+                event (tk.Event): a user input event.
+        """
+
+        # calls add unit function
+        self.add_unit()
+
+    def on_close_add_unit_form(self) -> None:
+        """
+            Closes the add unit form.
+        """
+
+        # destroys window and sets pointer to none
+        self.add_unit_window.destroy()
+        self.add_unit_window = None
 
     def add_unit(self) -> None:
         """
@@ -208,7 +296,8 @@ class RecordPage(tk.Frame):
 
         # validates unit code
         if not fullmatch(r"[A-Z]{3}\d{4}", unit_code):
-            messagebox.showerror("Input Error", "Unit code is invalid.")
+            self.unit_code.focus_set()
+            self.input_error_lbl.config(text="Input Error: Unit code is invalid.")
             return
 
         # validates mark
@@ -217,7 +306,8 @@ class RecordPage(tk.Frame):
             if mark < 0 or mark > 100:
                 raise ValueError
         except ValueError:
-            messagebox.showerror("Input Error", "Mark is invalid.")
+            self.mark.focus_set()
+            self.input_error_lbl.config(text="Input Error: Mark is invalid.")
             return
 
         # validates grade
@@ -227,7 +317,8 @@ class RecordPage(tk.Frame):
            (60 <= mark <= 69 and grade != "C") or \
            (70 <= mark <= 79 and grade != "D") or \
            (80 <= mark <= 100 and grade != "HD"):
-            messagebox.showerror("Input Error", "Grade is invalid.")
+            self.grade.focus_set()
+            self.input_error_lbl.config(text="Input Error: Grade is invalid.")
             return
 
         # validates credit points
@@ -236,7 +327,8 @@ class RecordPage(tk.Frame):
             if credit_pts < 1 or credit_pts > 24:
                 raise ValueError
         except ValueError:
-            messagebox.showerror("Input Error", "Credit points is invalid.")
+            self.credit_pts.focus_set()
+            self.input_error_lbl.config(text="Input Error: Credit points is invalid.")
             return
 
         # converts mark and credit points back to strings
@@ -254,99 +346,58 @@ class RecordPage(tk.Frame):
         self.wam_lbl.config(text=self.record.get_wam())
         self.gpa_lbl.config(text=self.record.get_gpa())
 
-        # clears entry boxes
-        self.unit_code.delete(0, tk.END)
-        self.mark.delete(0, tk.END)
-        self.grade.delete(0, tk.END)
-        self.credit_pts.delete(0, tk.END)
-
-        # enables remove, save, and discard buttons
-        self.remove_unit_btn.config(state="normal")
-        self.save_changes_btn.config(state="normal")
-        self.discard_changes_btn.config(state="normal")
+        # closes add unit form
+        self.add_unit_window.destroy()
 
         # resets focus
-        self.focus.focus_set()
+        self.table.focus_set()
+
+        # displays success message to user
+        messagebox.showinfo("Add Unit", f"{unit_code} added.")
 
     def remove_unit(self) -> None:
         """
-            Removes the last unit.
+            Removes the selected unit.
         """
 
-        # deletes the last row of the table
-        rows = self.table.get_children()
-        if len(rows) > 0:
-            self.table.delete(rows[-1])
+        # gets the selected row
+        row = self.table.selection()
 
-        # removes the last unit in the record
-        self.record.remove_unit()
+        # checks if no unit is selected
+        if not row:
+            messagebox.showerror("Remove Unit", "Select a unit to remove.")
+            return
 
-        # scrolls table all the way down
-        children = self.table.get_children()
-        if len(children) > 0:
-            self.table.see(children[-1])
+        # gets unit details
+        unit = self.table.item(row[0])["values"]
+        unit_no = int(unit[0])
+        unit_code = unit[1]
+ 
+        # confirms that user wants to save changes
+        if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove {unit_code}?"):
+            return
+
+        # scrolls table view to selected row
+        self.table.see(row)
+
+        # deletes the selected unit from table and record
+        self.table.delete(row)
+        self.record.remove_unit(unit_no)
 
         # updates wam and gpa
         self.wam_lbl.config(text=self.record.get_wam())
         self.gpa_lbl.config(text=self.record.get_gpa())
 
-        # enables save and discard buttons
-        self.save_changes_btn.config(state="normal")
-        self.discard_changes_btn.config(state="normal")
+        # clear current table
+        for row in self.table.get_children():
+            self.table.delete(row)
 
-        # disables remove unit button if there are no units
-        if len(self.record.get_data()) == 0:
-            self.remove_unit_btn.config(state="disabled")
+        # add units from record to table
+        for unit in self.record.get_data():
+            self.table.insert("", "end", values=unit)
 
         # resets focus
-        self.focus.focus_set()
-
-    def save_changes(self) -> None:
-        """
-            Saves the changes made to the record.
-        """
-
-        # confirms that user wants to save changes
-        if not messagebox.askyesno("Save Changes", "Are you sure you want to save changes?"):
-
-            # cancels save changes action
-            messagebox.showinfo("Save Changes", "Action cancelled.")
-            return
-
-        # saves the current record to file
-        self.record.save()
-
-        # disables save and discard buttons
-        self.save_changes_btn.config(state="disabled")
-        self.discard_changes_btn.config(state="disabled")
-
-        # reloads page
-        self.load_page()
+        self.table.focus_set()
 
         # displays success message to user
-        messagebox.showinfo("Save Changes", "Changes saved.")
-
-    def discard_changes(self) -> None:
-        """
-            Discard the changes made to the record.
-        """
-
-        # confirms that user wants to discard changes
-        if not messagebox.askyesno("Discard Changes", "Are you sure you want to discard changes?"):
-
-            # cancels discard changes action
-            messagebox.showinfo("Discard Changes", "Action cancelled.")
-            return
-
-        # resets the record data
-        self.record.reset()
-
-        # disables save and discard buttons
-        self.save_changes_btn.config(state="disabled")
-        self.discard_changes_btn.config(state="disabled")
-
-        # reloads page
-        self.load_page()
-
-        # displays success message to user
-        messagebox.showinfo("Discard Changes", "Changes discarded.")
+        messagebox.showinfo("Remove Unit", f"{unit_code} removed.")
