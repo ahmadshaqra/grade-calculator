@@ -53,7 +53,6 @@ class RecordPage(tk.Frame):
 
         # binds keyboard and mouse actions
         self.table.bind("<Button-1>", self.select_row)
-        self.table.bind("<ButtonRelease-1>", self.lock_column_sizes)
         self.table.bind("<BackSpace>", self.on_backspace)
         self.table.bind("<Return>", self.on_enter)
 
@@ -137,18 +136,6 @@ class RecordPage(tk.Frame):
 
         # stops default behaviour
         return "break"
-
-    def lock_column_sizes(self, event: tk.Event) -> None:
-        """
-            Locks column resizing by user.
-
-            Args:
-                event (tk.Event): a user input event.
-        """
-
-        # sets all columns to the fixed width
-        for column in self.columns:
-            self.table.column(column, width=self.column_width)
 
     def load_page(self) -> None:
         """
