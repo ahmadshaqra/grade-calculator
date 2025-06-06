@@ -27,7 +27,7 @@ class RecordPage(tk.Frame):
         self.record = Record()
 
         # sets frame to hold table
-        table_frame = tk.Frame(self, width=500, height=235)
+        table_frame = tk.Frame(self, width=500, height=275)
         table_frame.pack()
         table_frame.grid_propagate(False)
 
@@ -44,7 +44,7 @@ class RecordPage(tk.Frame):
         self.column_width = 96
 
         # initialises table
-        self.table = ttk.Treeview(table_frame, columns=self.columns, show="headings", height=10)
+        self.table = ttk.Treeview(table_frame, columns=self.columns, show="headings", height=12)
 
         # adds columns to the table
         for column in self.columns:
@@ -55,6 +55,7 @@ class RecordPage(tk.Frame):
         self.table.bind("<Button-1>", self.select_row)
         self.table.bind("<ButtonRelease-1>", self.lock_column_sizes)
         self.table.bind("<BackSpace>", self.on_backspace)
+        self.table.bind("<Return>", self.on_enter)
 
         # initialises scrollbar for the table
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.table.yview)
@@ -64,40 +65,12 @@ class RecordPage(tk.Frame):
         self.table.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
 
-        # sets frame to hold add unit entry boxes
-        add_unit_frame = tk.Frame(self)
-        add_unit_frame.pack(pady=10)
-
-        # adds unit code label and entry box
-        tk.Label(add_unit_frame, text="Unit Code: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.unit_code = tk.Entry(add_unit_frame, width=10, font=("Segoe UI", 10))
-        self.unit_code.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.unit_code.bind("<Return>", self.on_enter)
-
-        # adds mark label and entry box
-        tk.Label(add_unit_frame, text="Mark: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.mark = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.mark.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.mark.bind("<Return>", self.on_enter)
-
-        # adds grade label and entry box
-        tk.Label(add_unit_frame, text="Grade: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.grade = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.grade.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.grade.bind("<Return>", self.on_enter)
-
-        # adds credit points label and entry box
-        tk.Label(add_unit_frame, text="Credit Points: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.credit_pts = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.credit_pts.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.credit_pts.bind("<Return>", self.on_enter)
-
         # sets frame to hold control buttons
         control_frame = tk.Frame(self)
         control_frame.pack(pady=10)
 
         # adds the control buttons
-        tk.Button(control_frame, text="Add Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
+        tk.Button(control_frame, text="Add Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit_form()).pack(side="left", expand=True, fill="both", padx=10)
         tk.Button(control_frame, text="Remove Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.remove_unit()).pack(side="left", expand=True, fill="both", padx=10)
 
         # sets frame to hold results information
@@ -116,14 +89,14 @@ class RecordPage(tk.Frame):
 
     def on_enter(self, event: tk.Event) -> None:
         """
-            Allows user to add unit by pressing enter.
+            Allows user to open add unit form by pressing enter.
 
             Args:
                 event (tk.Event): a user input event.
         """
 
-        # calls add unit function
-        self.add_unit()
+        # calls add unit form function
+        self.add_unit_form()
 
     def on_backspace(self, event: tk.Event) -> None:
         """
@@ -202,48 +175,109 @@ class RecordPage(tk.Frame):
         if len(children) > 0:
             self.table.see(children[0])
 
-        # clears entry boxes
-        self.unit_code.delete(0, tk.END)
-        self.mark.delete(0, tk.END)
-        self.grade.delete(0, tk.END)
-        self.credit_pts.delete(0, tk.END)
-
         # resets focus
         self.table.focus_set()
+
+    def add_unit_form(self) -> None:
+        """
+            Creates the add unit form.
+        """
+
+        # creates the add unit window
+        self.add_unit_window = tk.Toplevel(self)
+
+        # sets title
+        self.add_unit_window.title("Add Unit")
+
+        # sets the window dimensions
+        window_width = 400
+        window_height = 270
+
+        # gets the screen dimensions
+        screen_width = self.add_unit_window.winfo_screenwidth()
+        screen_height = self.add_unit_window.winfo_screenheight()
+
+        # calculates desired window position
+        x = (screen_width // 2) - (window_width // 2)
+        y = (screen_height // 2) - (window_height // 2) - 30
+
+        # sets window size and position and disables resizing
+        self.add_unit_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        self.add_unit_window.resizable(False, False)
+
+        # adds title label
+        tk.Label(self.add_unit_window, text="Add Details for New Unit", font=("Segoe UI", 10, "bold")).pack(pady=10)
+
+        # sets entry frame
+        entry_frame = tk.Frame(self.add_unit_window)
+        entry_frame.pack(pady=0)
+
+        # sets left frame
+        left_frame = tk.Frame(entry_frame)
+        left_frame.pack(side="left", expand=True, fill="both", padx=5)
+
+        # sets right frame
+        right_frame = tk.Frame(entry_frame)
+        right_frame.pack(side="left", expand=True, fill="both", padx=5)
+
+        # creates and sets unit code frame, label, and entry box
+        unit_code_frame = tk.LabelFrame(left_frame, text="Unit Code", font=("Segoe UI", 10, "bold"))
+        unit_code_frame.pack(pady=5)
+        self.unit_code = tk.Entry(unit_code_frame, width=15, font=("Segoe UI", 10))
+        self.unit_code.pack(padx=10, pady=10)
+        self.unit_code.bind("<Return>", self.on_enter_add_unit_form)
+
+        # creates and sets mark frame, label, and entry box
+        mark_frame = tk.LabelFrame(left_frame, text="Mark", font=("Segoe UI", 10, "bold"))
+        mark_frame.pack(pady=5)
+        self.mark = tk.Entry(mark_frame, width=15, font=("Segoe UI", 10))
+        self.mark.pack(padx=10, pady=10)
+        self.mark.bind("<Return>", self.on_enter_add_unit_form)
+
+        # creates and sets grade frame, label, and entry box
+        grade_frame = tk.LabelFrame(right_frame, text="Grade", font=("Segoe UI", 10, "bold"))
+        grade_frame.pack(pady=5)
+        self.grade = tk.Entry(grade_frame, width=15, font=("Segoe UI", 10))
+        self.grade.pack(padx=10, pady=10)
+        self.grade.bind("<Return>", self.on_enter_add_unit_form)
+
+        # creates and sets credit points frame, label, and entry box
+        credit_pts_frame = tk.LabelFrame(right_frame, text="Credit Points", font=("Segoe UI", 10, "bold"))
+        credit_pts_frame.pack(pady=5)
+        self.credit_pts = tk.Entry(credit_pts_frame, width=15, font=("Segoe UI", 10))
+        self.credit_pts.pack(padx=10, pady=10)
+        self.credit_pts.bind("<Return>", self.on_enter_add_unit_form)
+
+        # set frame for control buttons
+        control_frame = tk.Frame(self.add_unit_window)
+        control_frame.pack(pady=10)
+
+        # adds control buttons
+        tk.Button(control_frame, text="Cancel", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit_window.destroy()).pack(side="left", expand=True, fill="both", padx=10)
+        tk.Button(control_frame, text="Add", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
+
+        # adds input error label
+        self.input_error_lbl = tk.Label(self.add_unit_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
+        self.input_error_lbl.pack(pady=5)
+
+        # sets focus on window
+        self.add_unit_window.focus_set()
+
+    def on_enter_add_unit_form(self, event: tk.Event) -> None:
+        """
+            Allows user to add unit by pressing enter.
+
+            Args:
+                event (tk.Event): a user input event.
+        """
+
+        # calls add unit function
+        self.add_unit()
 
     def add_unit(self) -> None:
         """
             Adds a unit to the record.
         """
-
-        add_unit_form = tk.Toplevel(self)
-        add_unit_form.title("Add Unit")
-
-        # tk.Label(add_unit_form, text="", font=("Segoe UI", 10, "bold")).pack(pady=10)
-
-        # # adds unit code label and entry box
-        # tk.Label(add_unit_form, text="Unit Code: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        # self.unit_code = tk.Entry(add_unit_form, width=10, font=("Segoe UI", 10))
-        # self.unit_code.pack(side="left", expand=True, fill="both", padx=(0,10))
-        # self.unit_code.bind("<Return>", self.on_enter)
-
-        # # adds mark label and entry box
-        # tk.Label(add_unit_form, text="Mark: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        # self.mark = tk.Entry(add_unit_form, width=5, font=("Segoe UI", 10))
-        # self.mark.pack(side="left", expand=True, fill="both", padx=(0,10))
-        # self.mark.bind("<Return>", self.on_enter)
-
-        # # adds grade label and entry box
-        # tk.Label(add_unit_form, text="Grade: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        # self.grade = tk.Entry(add_unit_form, width=5, font=("Segoe UI", 10))
-        # self.grade.pack(side="left", expand=True, fill="both", padx=(0,10))
-        # self.grade.bind("<Return>", self.on_enter)
-
-        # # adds credit points label and entry box
-        # tk.Label(add_unit_form, text="Credit Points: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        # self.credit_pts = tk.Entry(add_unit_form, width=5, font=("Segoe UI", 10))
-        # self.credit_pts.pack(side="left", expand=True, fill="both", padx=(0,10))
-        # self.credit_pts.bind("<Return>", self.on_enter)
 
         # gets all the unit details from entry boxes
         unit_code = self.unit_code.get().upper()
@@ -253,7 +287,8 @@ class RecordPage(tk.Frame):
 
         # validates unit code
         if not fullmatch(r"[A-Z]{3}\d{4}", unit_code):
-            messagebox.showerror("Input Error", "Unit code is invalid.")
+            self.unit_code.focus_set()
+            self.input_error_lbl.config(text="Input Error: Unit code is invalid.")
             return
 
         # validates mark
@@ -262,7 +297,8 @@ class RecordPage(tk.Frame):
             if mark < 0 or mark > 100:
                 raise ValueError
         except ValueError:
-            messagebox.showerror("Input Error", "Mark is invalid.")
+            self.mark.focus_set()
+            self.input_error_lbl.config(text="Input Error: Mark is invalid.")
             return
 
         # validates grade
@@ -272,7 +308,8 @@ class RecordPage(tk.Frame):
            (60 <= mark <= 69 and grade != "C") or \
            (70 <= mark <= 79 and grade != "D") or \
            (80 <= mark <= 100 and grade != "HD"):
-            messagebox.showerror("Input Error", "Grade is invalid.")
+            self.grade.focus_set()
+            self.input_error_lbl.config(text="Input Error: Grade is invalid.")
             return
 
         # validates credit points
@@ -281,7 +318,8 @@ class RecordPage(tk.Frame):
             if credit_pts < 1 or credit_pts > 24:
                 raise ValueError
         except ValueError:
-            messagebox.showerror("Input Error", "Credit points is invalid.")
+            self.credit_pts.focus_set()
+            self.input_error_lbl.config(text="Input Error: Credit points is invalid.")
             return
 
         # converts mark and credit points back to strings
@@ -299,11 +337,8 @@ class RecordPage(tk.Frame):
         self.wam_lbl.config(text=self.record.get_wam())
         self.gpa_lbl.config(text=self.record.get_gpa())
 
-        # clears entry boxes
-        self.unit_code.delete(0, tk.END)
-        self.mark.delete(0, tk.END)
-        self.grade.delete(0, tk.END)
-        self.credit_pts.delete(0, tk.END)
+        # closes add unit form
+        self.add_unit_window.destroy()
 
         # resets focus
         self.table.focus_set()
