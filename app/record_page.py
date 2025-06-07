@@ -53,8 +53,8 @@ class RecordPage(tk.Frame):
 
         # binds keyboard and mouse actions
         self.table.bind("<Button-1>", self.select_row)
-        self.table.bind("<BackSpace>", self.on_backspace)
-        self.table.bind("<Return>", self.on_enter)
+        self.table.bind("<BackSpace>", lambda e: self.remove_unit())
+        self.table.bind("<Return>", lambda e: self.add_unit_form())
 
         # initialises scrollbar for the table
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.table.yview)
@@ -88,28 +88,6 @@ class RecordPage(tk.Frame):
 
         # initialises add unit window pointer
         self.add_unit_window = None
-
-    def on_enter(self, event: tk.Event) -> None:
-        """
-            Allows user to open add unit form by pressing enter.
-
-            Args:
-                event (tk.Event): a user input event.
-        """
-
-        # calls add unit form function
-        self.add_unit_form()
-
-    def on_backspace(self, event: tk.Event) -> None:
-        """
-            Allows user to remove unit by pressing backspace.
-
-            Args:
-                event (tk.Event): a user input event.
-        """
-
-        # calls remove unit function
-        self.remove_unit()
 
     def select_row(self, event: tk.Event) -> None:
         """
@@ -218,28 +196,28 @@ class RecordPage(tk.Frame):
             unit_code_frame.pack(pady=5)
             self.unit_code = tk.Entry(unit_code_frame, width=15, font=("Segoe UI", 10))
             self.unit_code.pack(padx=10, pady=10)
-            self.unit_code.bind("<Return>", self.on_enter_add_unit_form)
+            self.unit_code.bind("<Return>", lambda e: self.mark.focus_set())
 
             # creates and sets mark frame, label, and entry box
             mark_frame = tk.LabelFrame(left_frame, text="Mark", font=("Segoe UI", 10, "bold"))
             mark_frame.pack(pady=5)
             self.mark = tk.Entry(mark_frame, width=15, font=("Segoe UI", 10))
             self.mark.pack(padx=10, pady=10)
-            self.mark.bind("<Return>", self.on_enter_add_unit_form)
+            self.mark.bind("<Return>", lambda e: self.grade.focus_set())
 
             # creates and sets grade frame, label, and entry box
             grade_frame = tk.LabelFrame(right_frame, text="Grade", font=("Segoe UI", 10, "bold"))
             grade_frame.pack(pady=5)
             self.grade = tk.Entry(grade_frame, width=15, font=("Segoe UI", 10))
             self.grade.pack(padx=10, pady=10)
-            self.grade.bind("<Return>", self.on_enter_add_unit_form)
+            self.grade.bind("<Return>", lambda e: self.credit_pts.focus_set())
 
             # creates and sets credit points frame, label, and entry box
             credit_pts_frame = tk.LabelFrame(right_frame, text="Credit Points", font=("Segoe UI", 10, "bold"))
             credit_pts_frame.pack(pady=5)
             self.credit_pts = tk.Entry(credit_pts_frame, width=15, font=("Segoe UI", 10))
             self.credit_pts.pack(padx=10, pady=10)
-            self.credit_pts.bind("<Return>", self.on_enter_add_unit_form)
+            self.credit_pts.bind("<Return>", lambda e: self.add_unit())
 
             # set frame for control buttons
             control_frame = tk.Frame(self.add_unit_window)
@@ -251,7 +229,7 @@ class RecordPage(tk.Frame):
 
             # adds input error label
             self.input_error_lbl = tk.Label(self.add_unit_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
-            self.input_error_lbl.pack(pady=5)
+            self.input_error_lbl.pack()
 
         # add unit form already open
         else:
@@ -260,19 +238,8 @@ class RecordPage(tk.Frame):
             self.add_unit_window.deiconify()
             self.add_unit_window.lift()
 
-        # sets focus on window
-        self.add_unit_window.focus_set()
-
-    def on_enter_add_unit_form(self, event: tk.Event) -> None:
-        """
-            Allows user to add unit by pressing enter.
-
-            Args:
-                event (tk.Event): a user input event.
-        """
-
-        # calls add unit function
-        self.add_unit()
+        # sets focus on unit code entry box
+        self.unit_code.focus_set()
 
     def on_close_add_unit_form(self) -> None:
         """

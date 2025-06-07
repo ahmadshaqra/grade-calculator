@@ -116,19 +116,19 @@ class WAM:
         # saves data to file
         FileManager.write_file("wam.txt", self.data)
 
-    def remove_unit(self) -> None:
+    def remove_unit(self, unit_no: int) -> None:
         """
-            Removes the last unit in the WAM data.
+            Removes a unit in the WAM data.
+
+            Args:
+                unit_no (int): the unit to delete.
         """
 
-        # checks if there are units in the data array
-        if len(self.data) > 0:
+        # deletes unit from data
+        self.data.pop(unit_no - len(self.record) - 1)
 
-            # removes the last unit from the data array
-            self.data.pop()
-
-            # saves data to file
-            FileManager.write_file("wam.txt", self.data)
+        # saves data to file
+        FileManager.write_file("wam.txt", self.data)
 
     def reset(self) -> None:
         """

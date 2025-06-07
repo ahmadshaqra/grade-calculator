@@ -26,7 +26,7 @@ class GPAPage(tk.Frame):
         self.gpa = GPA()
 
         # sets frame to hold table
-        table_frame = tk.Frame(self, width=500, height=235)
+        table_frame = tk.Frame(self, width=500, height=275)
         table_frame.pack()
         table_frame.grid_propagate(False)
 
@@ -35,6 +35,7 @@ class GPAPage(tk.Frame):
         style.theme_use("alt")
         style.configure("Treeview", font=("Segoe UI", 10))
         style.configure("Treeview.Heading", background="lightgrey", font=("Segoe UI", 10, "bold"))
+        style.map("Treeview", background=[("selected", "lightgrey")], foreground=[("selected", "black")])
         style.map("Treeview.Heading", background=[("!active", "lightgrey"), ("active", "lightgrey"), ("pressed", "lightgrey")])
 
         # sets columns of the table
@@ -42,16 +43,17 @@ class GPAPage(tk.Frame):
         self.column_width = 160
 
         # initialises table
-        self.table = ttk.Treeview(table_frame, columns=self.columns, show="headings", height=10)
+        self.table = ttk.Treeview(table_frame, columns=self.columns, show="headings", height=12)
 
         # adds columns to the table
         for column in self.columns:
             self.table.heading(column, text=column)
             self.table.column(column, anchor="center", width=self.column_width, minwidth=self.column_width, stretch=False)
 
-        # disabling row selection and column size change
-        self.table.bind("<<TreeviewSelect>>", self.disable_row_selection)
-        self.table.bind("<ButtonRelease-1>", self.lock_column_sizes)
+        # binds keyboard and mouse actions
+        self.table.bind("<Button-1>", self.select_row)
+        self.table.bind("<BackSpace>", lambda e: self.remove_unit())
+        self.table.bind("<Return>", lambda e: self.add_unit_form())
 
         # add tag for current record
         self.table.tag_configure("current", background="whitesmoke")
@@ -64,30 +66,13 @@ class GPAPage(tk.Frame):
         self.table.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
 
-        # sets frame to hold add unit entry boxes
-        add_unit_frame = tk.Frame(self)
-        add_unit_frame.pack(pady=10)
-
-        # adds grade label and entry box
-        tk.Label(add_unit_frame, text="Grade: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.grade = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.grade.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.grade.bind("<Return>", self.on_enter)
-
-        # adds credit points label and entry box
-        tk.Label(add_unit_frame, text="Credit Points: ", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(10,0))
-        self.credit_pts = tk.Entry(add_unit_frame, width=5, font=("Segoe UI", 10))
-        self.credit_pts.pack(side="left", expand=True, fill="both", padx=(0,10))
-        self.credit_pts.bind("<Return>", self.on_enter)
-
         # sets frame to hold control buttons
         control_frame = tk.Frame(self)
         control_frame.pack(pady=10)
 
         # adds the control buttons
-        tk.Button(control_frame, text="Add Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
-        self.remove_unit_btn = tk.Button(control_frame, text="Remove Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.remove_unit())
-        self.remove_unit_btn.pack(side="left", expand=True, fill="both", padx=10)
+        tk.Button(control_frame, text="Add Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit_form()).pack(side="left", expand=True, fill="both", padx=10)
+        tk.Button(control_frame, text="Remove Unit", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.remove_unit()).pack(side="left", expand=True, fill="both", padx=10)
 
         # sets frame to hold results information
         results_frame = tk.Frame(self)
@@ -95,52 +80,45 @@ class GPAPage(tk.Frame):
 
         # adds current gpa information label
         tk.Label(results_frame, text="Current GPA:", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(20, 0))
-        self.current_gpa_lbl = tk.Label(results_frame, text="0.000", font=("Segoe UI", 10))
+        self.current_gpa_lbl = tk.Label(results_frame, text="00.000", font=("Segoe UI", 10))
         self.current_gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
         # adds calculated gpa information label
         tk.Label(results_frame, text="Calculated GPA:", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(20, 0))
-        self.calculated_gpa_lbl = tk.Label(results_frame, text="0.000", font=("Segoe UI", 10))
+        self.calculated_gpa_lbl = tk.Label(results_frame, text="00.000", font=("Segoe UI", 10))
         self.calculated_gpa_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
-        # creates a hidden focus point
-        self.focus = tk.Canvas(self, width=0, height=0, highlightthickness=0)
-        self.focus.pack()
-        self.focus.focus_set()
+        # initialises add unit window pointer
+        self.add_unit_window = None
 
-    def on_enter(self, event: tk.Event) -> None:
+    def select_row(self, event: tk.Event) -> None:
         """
-            Allows user to add unit by pressing enter.
+            Handles a select row action.
 
             Args:
                 event (tk.Event): a user input event.
         """
 
-        # calls add unit function
-        self.add_unit()
+        # gets the row id of the event
+        row = self.table.identify_row(event.y)
 
-    def disable_row_selection(self, event: tk.Event) -> None:
-        """
-            Disables row selection by user.
+        # clicked on an unselected and untagged row
+        if row and row not in self.table.selection() and not self.table.item(row)["tags"]:
 
-            Args:
-                event (tk.Event): a user input event.
-        """
+            # sets the selection
+            self.table.selection_set(row)
 
-        # removes the selection from row
-        self.table.selection_remove(self.table.selection())
+        # clicked on empty space or selected row
+        else:
 
-    def lock_column_sizes(self, event: tk.Event) -> None:
-        """
-            Locks column resizing by user.
+            # clears selection
+            self.table.selection_remove(self.table.selection())
 
-            Args:
-                event (tk.Event): a user input event.
-        """
+        # sets focus to the table
+        self.table.focus_set()
 
-        # sets all columns to the fixed width
-        for column in self.columns:
-            self.table.column(column, width=self.column_width)
+        # stops default behaviour
+        return "break"
 
     def load_page(self) -> None:
         """
@@ -171,20 +149,93 @@ class GPAPage(tk.Frame):
         if len(children) > 0:
             self.table.see(children[0])
 
-        # clears entry boxes
-        self.grade.delete(0, tk.END)
-        self.credit_pts.delete(0, tk.END)
-
-        # disables remove unit button if there are no units in extra gpa data
-        if len(self.gpa.get_data()) == 0:
-            self.remove_unit_btn.config(state="disabled")
-
-        # enables remove unit button if there are units in extra gpa data
-        else:
-            self.remove_unit_btn.config(state="normal")
-
         # resets focus
-        self.focus.focus_set()
+        self.table.focus_set()
+
+    def add_unit_form(self) -> None:
+        """
+            Creates the add unit form.
+        """
+
+        # checks if add unit form already exists
+        if self.add_unit_window is None or not self.add_unit_window.winfo_exists():
+
+            # creates the add unit window
+            self.add_unit_window = tk.Toplevel(self)
+
+            # sets close protocol
+            self.add_unit_window.protocol("WM_DELETE_WINDOW", self.on_close_add_unit_form)
+
+            # sets title
+            self.add_unit_window.title("Add Unit")
+
+            # sets the window dimensions
+            window_width = 400
+            window_height = 270
+
+            # gets the screen dimensions
+            screen_width = self.add_unit_window.winfo_screenwidth()
+            screen_height = self.add_unit_window.winfo_screenheight()
+
+            # calculates desired window position
+            x = (screen_width // 2) - (window_width // 2)
+            y = (screen_height // 2) - (window_height // 2) - 30
+
+            # sets window size and position and disables resizing
+            self.add_unit_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+            self.add_unit_window.resizable(False, False)
+
+            # adds title label
+            tk.Label(self.add_unit_window, text="Add Details for New Unit", font=("Segoe UI", 10, "bold")).pack(pady=10)
+
+            # sets entry frame
+            entry_frame = tk.Frame(self.add_unit_window)
+            entry_frame.pack(pady=0)
+
+            # creates and sets mark frame, label, and entry box
+            grade_frame = tk.LabelFrame(self.add_unit_window, text="Grade", font=("Segoe UI", 10, "bold"))
+            grade_frame.pack(pady=5)
+            self.grade = tk.Entry(grade_frame, width=15, font=("Segoe UI", 10))
+            self.grade.pack(padx=10, pady=10)
+            self.grade.bind("<Return>", lambda e: self.credit_pts.focus_set())
+
+            # creates and sets credit points frame, label, and entry box
+            credit_pts_frame = tk.LabelFrame(self.add_unit_window, text="Credit Points", font=("Segoe UI", 10, "bold"))
+            credit_pts_frame.pack(pady=5)
+            self.credit_pts = tk.Entry(credit_pts_frame, width=15, font=("Segoe UI", 10))
+            self.credit_pts.pack(padx=10, pady=10)
+            self.credit_pts.bind("<Return>", lambda e: self.add_unit())
+
+            # set frame for control buttons
+            control_frame = tk.Frame(self.add_unit_window)
+            control_frame.pack(pady=10)
+
+            # adds control buttons
+            tk.Button(control_frame, text="Cancel", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit_window.destroy()).pack(side="left", expand=True, fill="both", padx=10)
+            tk.Button(control_frame, text="Add", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
+
+            # adds input error label
+            self.input_error_lbl = tk.Label(self.add_unit_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
+            self.input_error_lbl.pack()
+
+        # add unit form already open
+        else:
+
+            # brings the form to the front
+            self.add_unit_window.deiconify()
+            self.add_unit_window.lift()
+
+        # sets focus on grade entry box
+        self.grade.focus_set()
+
+    def on_close_add_unit_form(self) -> None:
+        """
+            Closes the add unit form.
+        """
+
+        # destroys window and sets pointer to none
+        self.add_unit_window.destroy()
+        self.add_unit_window = None
 
     def add_unit(self) -> None:
         """
@@ -197,7 +248,8 @@ class GPAPage(tk.Frame):
 
         # validates grade
         if grade not in ["WN", "N", "P", "C", "D", "HD"]:
-            messagebox.showerror("Input Error", "Grade is invalid.")
+            self.grade.focus_set()
+            self.input_error_lbl.config(text="Input Error: Grade is invalid.")
             return
 
         # validates credit points
@@ -206,11 +258,12 @@ class GPAPage(tk.Frame):
             if credit_pts < 1 or credit_pts > 24:
                 raise ValueError
         except ValueError:
-            messagebox.showerror("Input Error", "Credit points is invalid.")
+            self.credit_pts.focus_set()
+            self.input_error_lbl.config(text="Input Error: Credit points is invalid.")
             return
         credit_pts = str(credit_pts)
 
-        # adds unit to the gpa data and table
+        # adds unit to the gpa and table
         self.gpa.add_unit([grade, credit_pts])
         self.table.insert("", "end", values=self.gpa.get_data()[-1])
 
@@ -220,40 +273,60 @@ class GPAPage(tk.Frame):
         # updates calculated gpa
         self.calculated_gpa_lbl.config(text=self.gpa.get_calculated_gpa())
 
-        # clears entry boxes
-        self.grade.delete(0, tk.END)
-        self.credit_pts.delete(0, tk.END)
-
-        # enables remove button
-        self.remove_unit_btn.config(state="normal")
+        # closes add unit form
+        self.add_unit_window.destroy()
 
         # resets focus
-        self.focus.focus_set()
+        self.table.focus_set()
+
+        # displays success message to user
+        messagebox.showinfo("Add Unit", f"Unit {len(self.gpa.get_record()) + len(self.gpa.get_data())} added.")
 
     def remove_unit(self) -> None:
         """
-            Removes the last unit.
+            Removes the selected unit.
         """
 
-        # deletes the last row of the table
-        rows = self.table.get_children()
-        if len(rows) > 0:
-            self.table.delete(rows[-1])
+        # gets the selected row
+        row = self.table.selection()
 
-        # removes the last unit in the gpa data
-        self.gpa.remove_unit()
+        # checks if no unit is selected
+        if not row:
+            messagebox.showerror("Remove Unit", "Select a unit to remove.")
+            return
 
-        # scrolls table all the way down
-        children = self.table.get_children()
-        if len(children) > 0:
-            self.table.see(children[-1])
+        # gets unit details
+        unit = self.table.item(row[0])["values"]
+        unit_no = int(unit[0])
+ 
+        # confirms that user wants to save changes
+        if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove Unit {unit_no}?"):
+            return
+
+        # scrolls table view to selected row
+        self.table.see(row)
+
+        # deletes the selected unit from table and gpa
+        self.table.delete(row)
+        self.gpa.remove_unit(unit_no)
 
         # updates calculated gpa
         self.calculated_gpa_lbl.config(text=self.gpa.get_calculated_gpa())
 
-        # disables remove unit button if there are no units
-        if len(self.gpa.get_data()) == 0:
-            self.remove_unit_btn.config(state="disabled")
+        # clear current table
+        for row in self.table.get_children():
+            self.table.delete(row)
+
+        # add units from gpa record data to table
+        for unit in self.gpa.get_record():
+            self.table.insert("", "end", values=unit, tags=("current",))
+
+        # add units from gpa extra data to table
+        for unit in self.gpa.get_data():
+            self.table.insert("", "end", values=unit)
 
         # resets focus
-        self.focus.focus_set()
+        self.table.focus_set()
+
+        # displays success message to user
+        messagebox.showinfo("Remove Unit", f"Unit {unit_no} removed.")
