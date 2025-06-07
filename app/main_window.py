@@ -20,8 +20,9 @@ class MainWindow(tk.Tk):
             Initialises the main window of the application.
         """
 
-        # initialises main window
+        # initialises main window and entry window
         super().__init__()
+        self.entry_window = None
 
         # sets title
         self.title("Grade Calculator")
@@ -55,10 +56,10 @@ class MainWindow(tk.Tk):
 
         # initialises available pages
         self.pages = {
-            "Record": RecordPage(self.main_frame),
-            "WAM": WAMPage(self.main_frame),
-            "GPA": GPAPage(self.main_frame),
-            "Unit": UnitPage(self.main_frame)
+            "Record": RecordPage(self.main_frame, self),
+            "WAM": WAMPage(self.main_frame, self),
+            "GPA": GPAPage(self.main_frame, self),
+            "Unit": UnitPage(self.main_frame, self)
         }
 
         # initialises menu buttons dictionary
@@ -84,6 +85,11 @@ class MainWindow(tk.Tk):
             Args:
                 name (str): the name of the selected page.
         """
+
+        # prevents an entry window from remaining open
+        if self.entry_window and self.entry_window.winfo_exists():
+            self.entry_window.destroy()
+            self.entry_window = None
 
         # gets the page object from the pages dictionary
         page = self.pages[name]

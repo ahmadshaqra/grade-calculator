@@ -13,17 +13,19 @@ class WAMPage(tk.Frame):
         Manages the WAM page.
     """
 
-    def __init__(self, root: tk.Frame) -> None:
+    def __init__(self, root: tk.Frame, main_window: tk.Tk) -> None:
         """
             Initialises the WAM page.
 
             Args:
                 root (tk.Frame): the main contents frame.
+                main_window (tk.Tk): the main window.
         """
 
-        # initialises the frame and initialises wam
+        # initialises the frame and wam data
         super().__init__(root)
         self.wam = WAM()
+        self.main_window = main_window
 
         # sets frame to hold table
         table_frame = tk.Frame(self, width=500, height=275)
@@ -87,9 +89,6 @@ class WAMPage(tk.Frame):
         tk.Label(results_frame, text="Calculated WAM:", font=("Segoe UI", 10, "bold")).pack(side="left", expand=True, fill="both", padx=(20, 0))
         self.calculated_wam_lbl = tk.Label(results_frame, text="00.000", font=("Segoe UI", 10))
         self.calculated_wam_lbl.pack(side="left", expand=True, fill="both", padx=(0, 20))
-
-        # initialises add unit window pointer
-        self.add_unit_window = None
 
     def select_row(self, event: tk.Event) -> None:
         """
@@ -158,38 +157,38 @@ class WAMPage(tk.Frame):
         """
 
         # checks if add unit form already exists
-        if self.add_unit_window is None or not self.add_unit_window.winfo_exists():
+        if self.main_window.entry_window is None or not self.main_window.entry_window.winfo_exists():
 
-            # creates the add unit window
-            self.add_unit_window = tk.Toplevel(self)
+            # creates the entry window
+            self.main_window.entry_window = tk.Toplevel(self)
 
             # sets close protocol
-            self.add_unit_window.protocol("WM_DELETE_WINDOW", self.on_close_add_unit_form)
+            self.main_window.entry_window.protocol("WM_DELETE_WINDOW", self.on_close_add_unit_form)
 
             # sets title
-            self.add_unit_window.title("Add Unit")
+            self.main_window.entry_window.title("Add Unit")
 
             # sets the window dimensions
             window_width = 400
             window_height = 270
 
             # gets the screen dimensions
-            screen_width = self.add_unit_window.winfo_screenwidth()
-            screen_height = self.add_unit_window.winfo_screenheight()
+            screen_width = self.main_window.entry_window.winfo_screenwidth()
+            screen_height = self.main_window.entry_window.winfo_screenheight()
 
             # calculates desired window position
             x = (screen_width // 2) - (window_width // 2)
             y = (screen_height // 2) - (window_height // 2) - 30
 
             # sets window size and position and disables resizing
-            self.add_unit_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
-            self.add_unit_window.resizable(False, False)
+            self.main_window.entry_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+            self.main_window.entry_window.resizable(False, False)
 
             # adds title label
-            tk.Label(self.add_unit_window, text="Add Details for New Unit", font=("Segoe UI", 10, "bold")).pack(pady=10)
+            tk.Label(self.main_window.entry_window, text="Add Details for New Unit", font=("Segoe UI", 10, "bold")).pack(pady=10)
 
             # sets entry frame
-            entry_frame = tk.Frame(self.add_unit_window)
+            entry_frame = tk.Frame(self.main_window.entry_window)
             entry_frame.pack(pady=0)
 
             # sets left frame
@@ -215,30 +214,30 @@ class WAMPage(tk.Frame):
             self.mark.bind("<Return>", lambda e: self.credit_pts.focus_set())
 
             # creates and sets credit points frame, label, and entry box
-            credit_pts_frame = tk.LabelFrame(self.add_unit_window, text="Credit Points", font=("Segoe UI", 10, "bold"))
+            credit_pts_frame = tk.LabelFrame(self.main_window.entry_window, text="Credit Points", font=("Segoe UI", 10, "bold"))
             credit_pts_frame.pack(pady=5)
             self.credit_pts = tk.Entry(credit_pts_frame, width=15, font=("Segoe UI", 10))
             self.credit_pts.pack(padx=10, pady=10)
             self.credit_pts.bind("<Return>", lambda e: self.add_unit())
 
             # set frame for control buttons
-            control_frame = tk.Frame(self.add_unit_window)
+            control_frame = tk.Frame(self.main_window.entry_window)
             control_frame.pack(pady=10)
 
             # adds control buttons
-            tk.Button(control_frame, text="Cancel", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit_window.destroy()).pack(side="left", expand=True, fill="both", padx=10)
+            tk.Button(control_frame, text="Cancel", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.main_window.entry_window.destroy()).pack(side="left", expand=True, fill="both", padx=10)
             tk.Button(control_frame, text="Add", font=("Segoe UI", 10, "bold"), width=15, command=lambda: self.add_unit()).pack(side="left", expand=True, fill="both", padx=10)
 
             # adds input error label
-            self.input_error_lbl = tk.Label(self.add_unit_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
+            self.input_error_lbl = tk.Label(self.main_window.entry_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
             self.input_error_lbl.pack()
 
         # add unit form already open
         else:
 
             # brings the form to the front
-            self.add_unit_window.deiconify()
-            self.add_unit_window.lift()
+            self.main_window.entry_window.deiconify()
+            self.main_window.entry_window.lift()
 
         # sets focus on year level entry box
         self.year_lvl.focus_set()
@@ -249,8 +248,8 @@ class WAMPage(tk.Frame):
         """
 
         # destroys window and sets pointer to none
-        self.add_unit_window.destroy()
-        self.add_unit_window = None
+        self.main_window.entry_window.destroy()
+        self.main_window.entry_window = None
 
     def add_unit(self) -> None:
         """
@@ -306,7 +305,7 @@ class WAMPage(tk.Frame):
         self.calculated_wam_lbl.config(text=self.wam.get_calculated_wam())
 
         # closes add unit form
-        self.add_unit_window.destroy()
+        self.main_window.entry_window.destroy()
 
         # resets focus
         self.table.focus_set()
