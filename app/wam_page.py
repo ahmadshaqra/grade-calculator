@@ -258,7 +258,7 @@ class WAMPage(tk.Frame):
         """
 
         # gets all the unit details from entry boxes
-        year_lvl = self.year_lvl.get().upper()
+        year_lvl = self.year_lvl.get()
         mark = self.mark.get()
         credit_pts = self.credit_pts.get()
 
