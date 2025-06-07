@@ -229,7 +229,7 @@ class RecordPage(tk.Frame):
 
             # adds input error label
             self.input_error_lbl = tk.Label(self.add_unit_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
-            self.input_error_lbl.pack(pady=5)
+            self.input_error_lbl.pack()
 
         # add unit form already open
         else:
