@@ -43,7 +43,7 @@ class OverviewPage(tk.Frame):
         style.map("Treeview.Heading", background=[("!active", "lightgrey"), ("active", "lightgrey"), ("pressed", "lightgrey")])
 
         # sets columns of the table
-        self.columns = ["Unit Code", "Mark (Grade)", "Average Required", "Remaining"]
+        self.columns = ["Unit Code", "Mark (Grade)", "Remaining", "Average Required"]
         self.column_width = 120
 
         # initialises table
@@ -318,6 +318,22 @@ class OverviewPage(tk.Frame):
         # updates target label
         self.target_lbl.config(text=self.unit.get_target())
 
+        # clear current table
+        for row in self.table.get_children():
+            self.table.delete(row)
+
+        # add units from unit data to table
+        for unit in self.unit.get_overview():
+            self.table.insert("", "end", values=unit)
+
+        # scrolls table all the way up
+        children = self.table.get_children()
+        if len(children) > 0:
+            self.table.see(children[0])
+
+        # resets focus
+        self.table.focus_set()
+
         # displays success message to user
         messagebox.showinfo("Change Target", "Target changed.")
 
@@ -330,7 +346,7 @@ class OverviewPage(tk.Frame):
         unit_code = self.unit_code.get().upper()
 
         # validates unit code
-        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code) or unit_code in self.unit.unit.keys():
+        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code) or unit_code in self.unit.data.keys():
             self.unit_code.focus_set()
             self.input_error_lbl.config(text="Input Error: Unit code is invalid.")
             return
