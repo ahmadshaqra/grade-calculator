@@ -346,8 +346,7 @@ class RecordPage(tk.Frame):
         # scrolls table view to selected row
         self.table.see(row)
 
-        # deletes the selected unit from table and record
-        self.table.delete(row)
+        # deletes the selected unit from record
         self.record.remove_unit(unit_no)
 
         # updates wam and gpa

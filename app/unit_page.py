@@ -5,8 +5,9 @@
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox
 from data.unit import Unit
+from app.summary_page import SummaryPage
+from app.edit_page import EditPage
 
 class UnitPage(tk.Frame):
     """
@@ -27,61 +28,64 @@ class UnitPage(tk.Frame):
         self.unit = Unit()
         self.main_window = main_window
 
-        subpage_select_frame = tk.Frame(self)
-        subpage_select_frame.pack(pady=0)
+        # sets frame to hold menu buttons
+        self.subpage_select_frame = tk.Frame(self)
+        self.subpage_select_frame.pack(pady=0)
 
-        subpage_frame = tk.Frame(self)
+        # sets main content frame
+        self.subpage_frame = tk.Frame(self)
+        self.subpage_frame.pack(fill="both", expand=True, pady=15)
 
-        self.summary_frame = tk.Frame(subpage_frame)
-        self.edit_frame = tk.Frame(subpage_frame)
-
-        # initialises available pages
+        # initialises available subpages
         self.subpages = {
-            "Summary": self.summary_frame,
-            "Edit Units": self.edit_frame
+            "Summary": SummaryPage(self.subpage_frame, self.unit, self.main_window),
+            "Edit": EditPage(self.subpage_frame, self.unit, self.main_window)
         }
-
-        # make two custom pages
 
         # initialises menu buttons dictionary
         self.subpage_btns = {}
 
-        # iterates through pages
-        for name, page in self.subpages.items():
+        # iterates through subpages
+        for name, subpage in self.subpages.items():
 
-            # places page in main content frame
-            page.place(relx=0, rely=0, relwidth=1, relheight=1)
+            # places subpage in subpage content frame
+            subpage.place(relx=0, rely=0, relwidth=1, relheight=1)
 
             # creates and adds menu button
-            self.subpage_btns[name] = tk.Button(subpage_select_frame, text=name, font=("Segoe UI", 10, "bold"), width=10, command=lambda name=name: self.show_page(name))
+            self.subpage_btns[name] = tk.Button(self.subpage_select_frame, text=name, font=("Segoe UI", 10, "bold"), width=10, command=lambda name=name: self.show_subpage(name))
             self.subpage_btns[name].pack(side="left", expand=True, fill="both", padx=10)
 
-    def show_page(self, name: str) -> None:
+    def show_subpage(self, name: str) -> None:
         """
-            Displays selected page on the subpage content frame.
+            Displays selected subpage on the subpage content frame.
 
             Args:
                 name (str): the name of the selected subpage.
         """
 
-        # gets the page object from the pages dictionary
+        # prevents an entry window from remaining open
+        if self.main_window.entry_window and self.main_window.entry_window.winfo_exists():
+            self.main_window.entry_window.destroy()
+            self.main_window.entry_window = None
+
+        # gets the subpage object from the subpages dictionary
         subpage = self.subpages[name]
 
-        # displays page contents and refreshes it
+        # displays subpage contents and refreshes it
         subpage.lift()
-        # subpage.load_page()
+        subpage.load_page()
 
-        # enables all menu buttons
+        # enables all subpage select buttons
         for btn in self.subpage_btns.values():
             btn.config(state="normal")
 
-        # disables selected page menu button
+        # disables selected subpage select button
         self.subpage_btns[name].config(state="disabled")
 
     def load_page(self) -> None:
         """
-            Loads page from data.
+            Loads page.
         """
 
-        # selects the first page
-        self.show_page(next(iter(self.subpages)))
+        # selects the summary subpage
+        self.show_subpage("Summary")

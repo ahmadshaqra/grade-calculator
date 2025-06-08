@@ -187,10 +187,6 @@ class GPAPage(tk.Frame):
             # adds title label
             tk.Label(self.main_window.entry_window, text="Add Details for New Unit", font=("Segoe UI", 10, "bold")).pack(pady=10)
 
-            # sets entry frame
-            entry_frame = tk.Frame(self.main_window.entry_window)
-            entry_frame.pack(pady=0)
-
             # creates and sets mark frame, label, and entry box
             grade_frame = tk.LabelFrame(self.main_window.entry_window, text="Grade", font=("Segoe UI", 10, "bold"))
             grade_frame.pack(pady=5)
@@ -305,8 +301,7 @@ class GPAPage(tk.Frame):
         # scrolls table view to selected row
         self.table.see(row)
 
-        # deletes the selected unit from table and gpa
-        self.table.delete(row)
+        # deletes the selected unit from gpa
         self.gpa.remove_unit(unit_no)
 
         # updates calculated gpa

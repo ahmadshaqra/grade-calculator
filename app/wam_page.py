@@ -337,8 +337,7 @@ class WAMPage(tk.Frame):
         # scrolls table view to selected row
         self.table.see(row)
 
-        # deletes the selected unit from table and wam
-        self.table.delete(row)
+        # deletes the selected unit from wam
         self.wam.remove_unit(unit_no)
 
         # updates calculated wam
