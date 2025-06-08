@@ -64,12 +64,12 @@ class Unit:
         FileManager.delete_file(f"{unit_code}.txt")
         self.reset()
 
-    def get_summary(self) -> list[list[str]]:
+    def get_overview(self) -> list[list[str]]:
         """
-            Returns the summary data.
+            Returns the overview data.
 
             Returns:
-                list[list[str]]: the summary data.
+                list[list[str]]: the overview data.
         """
 
         return [[unit_code, "-", "-", "-"] for unit_code in self.unit]

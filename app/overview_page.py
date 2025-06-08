@@ -1,7 +1,7 @@
 """
-    summary_page.py
+    overview_page.py
 
-    Contains the unit summary subpage logic.
+    Contains the unit overview subpage logic.
 """
 
 import tkinter as tk
@@ -9,14 +9,14 @@ from tkinter import ttk, messagebox
 from data.unit import Unit
 from re import fullmatch
 
-class SummaryPage(tk.Frame):
+class OverviewPage(tk.Frame):
     """
-        Manages the unit summary subpage.
+        Manages the unit overview subpage.
     """
 
     def __init__(self, root: tk.Frame, unit: Unit, main_window: tk.Tk) -> None:
         """
-            Initialises the unit summary subpage.
+            Initialises the unit overview subpage.
 
             Args:
                 root (tk.Frame): the subpage contents frame.
@@ -122,7 +122,7 @@ class SummaryPage(tk.Frame):
             self.table.delete(row)
 
         # add units from unit data to table
-        for unit in self.unit.get_summary():
+        for unit in self.unit.get_overview():
             self.table.insert("", "end", values=unit)
 
         # scrolls table all the way up
@@ -345,8 +345,8 @@ class SummaryPage(tk.Frame):
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from summary data to table
-        for unit in self.unit.get_summary():
+        # add units from overview data to table
+        for unit in self.unit.get_overview():
             self.table.insert("", "end", values=unit)
 
         # scrolls table all the way up
@@ -389,8 +389,8 @@ class SummaryPage(tk.Frame):
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from summary data to table
-        for unit in self.unit.get_summary():
+        # add units from overview data to table
+        for unit in self.unit.get_overview():
             self.table.insert("", "end", values=unit)
 
         # resets focus

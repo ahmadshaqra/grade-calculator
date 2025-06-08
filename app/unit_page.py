@@ -6,7 +6,7 @@
 
 import tkinter as tk
 from data.unit import Unit
-from app.summary_page import SummaryPage
+from app.overview_page import OverviewPage
 from app.edit_page import EditPage
 
 class UnitPage(tk.Frame):
@@ -38,7 +38,7 @@ class UnitPage(tk.Frame):
 
         # initialises available subpages
         self.subpages = {
-            "Summary": SummaryPage(self.subpage_frame, self.unit, self.main_window),
+            "Overview": OverviewPage(self.subpage_frame, self.unit, self.main_window),
             "Edit": EditPage(self.subpage_frame, self.unit, self.main_window)
         }
 
@@ -87,5 +87,5 @@ class UnitPage(tk.Frame):
             Loads page.
         """
 
-        # selects the summary subpage
-        self.show_subpage("Summary")
+        # selects the overview subpage
+        self.show_subpage("Overview")
