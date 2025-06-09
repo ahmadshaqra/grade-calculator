@@ -263,7 +263,7 @@ class RecordPage(tk.Frame):
         credit_pts = self.credit_pts.get()
 
         # validates unit code
-        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code):
+        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code) or unit_code in [unit for _, unit, _, _, _ in self.record.get_data()]:
             self.unit_code.focus_set()
             self.input_error_lbl.config(text="Input Error: Unit code is invalid.")
             return

@@ -172,6 +172,9 @@ class OverviewPage(tk.Frame):
         # adds title label
         tk.Label(self.main_window.entry_window, text="Set New Target", font=("Segoe UI", 10, "bold")).pack(pady=15)
 
+        # sets change target type
+        self.change_target_type = "Grade"
+
         # creates and sets target frame, label, and entry box
         self.target_frame = tk.LabelFrame(self.main_window.entry_window, text=f"Target {self.change_target_type}", font=("Segoe UI", 10, "bold"))
         self.target_frame.pack(pady=5)
@@ -212,6 +215,9 @@ class OverviewPage(tk.Frame):
 
         # updates new target entry label
         self.target_frame.config(text=f"Target {self.change_target_type}")
+
+        # resets input error label
+        self.input_error_lbl.config(text="")
 
     def add_unit_form(self) -> None:
         """

@@ -164,6 +164,10 @@ class EditPage(tk.Frame):
         self.add_assessment_btn.config(state="disabled")
         self.remove_assessment_btn.config(state="disabled")
 
+        # clear current table
+        for row in self.table.get_children():
+            self.table.delete(row)
+
         # sets focus to the table
         self.table.focus_set()
 
@@ -281,13 +285,15 @@ class EditPage(tk.Frame):
         unit_code = self.select_unit.get()
 
         # gets all the assessment details from entry boxes
-        assessment_name = self.assessment_name.get().capitalize()
+        assessment_name = self.assessment_name.get()
         weight = self.weight.get()
         obtained_marks = self.obtained_marks.get()
         total_marks = self.total_marks.get()
 
         # validates assessment name
-        if assessment_name in [assessment for assessment, _, _, _ in self.unit.data[unit_code]]:
+        if len(assessment_name) == 0 or \
+           len(assessment_name) > 15 or \
+           assessment_name in [assessment for assessment, _, _, _ in self.unit.data[unit_code]]:
             self.assessment_name.focus_set()
             self.input_error_lbl.config(text="Input Error: Assessment name is invalid.")
             return

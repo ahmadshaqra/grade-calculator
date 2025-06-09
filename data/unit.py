@@ -89,7 +89,7 @@ class Unit:
         """
 
         # removes the assessment from the unit in the data dictionary
-        self.data[unit_code].pop(assessment_no - 1)
+        self.data[unit_code].pop(assessment_no)
 
         # saves data to file
         FileManager.write_file(f"{unit_code}.txt", self.data[unit_code])
@@ -134,11 +134,6 @@ class Unit:
         elif self.target_type == "Mark":
             target = int(self.target)
 
-        # initialises details for unit
-        mark_grade = "-"
-        avg_req = str(target)
-        remaining = "100"
-
         # initialises mark and weight totals
         total_mark = 0
         total_weight = 0
@@ -171,22 +166,26 @@ class Unit:
             # sets mark/grade string
             mark_grade = f"{mark} ({grade})"
 
-            # calculates remaining assessments
-            remaining = f"{100 - total_weight:.2f}"
+        # no assessments entered
+        else:
+            mark_grade = "-"
 
-            # calculates average required
-            if total_weight < 100:
-                avg_req_float = (target - total_mark) * 100 / (100 - total_weight)
-            else:
-                avg_req_float = -1
+        # calculates remaining assessments
+        remaining = f"{100 - total_weight:.2f}"
 
-            # checks if average required is feasible
-            if avg_req_float < 0 or avg_req_float > 100:
-                avg_req = "-"
+        # calculates average required
+        if total_weight < 100:
+            avg_req_float = (target - total_mark) * 100 / (100 - total_weight)
+        else:
+            avg_req_float = -1
 
-            # sets average required string
-            else:
-                avg_req = f"{avg_req_float:.2f}"
+        # checks if average required is feasible
+        if avg_req_float < 0 or avg_req_float > 100:
+            avg_req = "-"
+
+        # sets average required string
+        else:
+            avg_req = f"{avg_req_float:.2f}"
 
         # returns unit overview
         return [unit_code, mark_grade, remaining, avg_req]
