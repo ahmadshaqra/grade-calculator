@@ -32,13 +32,15 @@ class GPAPage(tk.Frame):
         table_frame.pack()
         table_frame.grid_propagate(False)
 
-        # sets the style of the table
+        # sets the style of the page
         style = ttk.Style(self)
         style.theme_use("alt")
         style.configure("Treeview", font=("Segoe UI", 10))
         style.configure("Treeview.Heading", background="lightgrey", font=("Segoe UI", 10, "bold"))
         style.map("Treeview", background=[("selected", "lightgrey")], foreground=[("selected", "black")])
         style.map("Treeview.Heading", background=[("!active", "lightgrey"), ("active", "lightgrey"), ("pressed", "lightgrey")])
+        self.option_add("*Entry.selectBackground", "lightgrey")
+        self.option_add("*Entry.selectForeground", "black")
 
         # sets columns of the table
         self.columns = ["Unit #", "Grade", "Credit Points"]
@@ -127,15 +129,15 @@ class GPAPage(tk.Frame):
         # resets gpa data
         self.gpa.reset()
 
-        # clear current table
+        # clears current table
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from gpa record data to table
+        # adds units from gpa record data to table
         for unit in self.gpa.get_record():
             self.table.insert("", "end", values=unit, tags=("current",))
 
-        # add units from gpa extra data to table
+        # adds units from gpa extra data to table
         for unit in self.gpa.get_data():
             self.table.insert("", "end", values=unit)
 
@@ -294,7 +296,7 @@ class GPAPage(tk.Frame):
         unit = self.table.item(row[0])["values"]
         unit_no = int(unit[0])
  
-        # confirms that user wants to save changes
+        # confirms that user wants to remove unit
         if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove Unit {unit_no}?"):
             return
 
@@ -307,15 +309,15 @@ class GPAPage(tk.Frame):
         # updates calculated gpa
         self.calculated_gpa_lbl.config(text=self.gpa.get_calculated_gpa())
 
-        # clear current table
+        # clears current table
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from gpa record data to table
+        # adds units from gpa record data to table
         for unit in self.gpa.get_record():
             self.table.insert("", "end", values=unit, tags=("current",))
 
-        # add units from gpa extra data to table
+        # adds units from gpa extra data to table
         for unit in self.gpa.get_data():
             self.table.insert("", "end", values=unit)
 

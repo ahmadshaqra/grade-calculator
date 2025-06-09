@@ -32,13 +32,15 @@ class WAMPage(tk.Frame):
         table_frame.pack()
         table_frame.grid_propagate(False)
 
-        # sets the style of the table
+        # sets the style of the page
         style = ttk.Style(self)
         style.theme_use("alt")
         style.configure("Treeview", font=("Segoe UI", 10))
         style.configure("Treeview.Heading", background="lightgrey", font=("Segoe UI", 10, "bold"))
         style.map("Treeview", background=[("selected", "lightgrey")], foreground=[("selected", "black")])
         style.map("Treeview.Heading", background=[("!active", "lightgrey"), ("active", "lightgrey"), ("pressed", "lightgrey")])
+        self.option_add("*Entry.selectBackground", "lightgrey")
+        self.option_add("*Entry.selectForeground", "black")
 
         # sets columns of the table
         self.columns = ["Unit #", "Year Level", "Mark", "Credit Points"]
@@ -127,15 +129,15 @@ class WAMPage(tk.Frame):
         # resets wam data
         self.wam.reset()
 
-        # clear current table
+        # clears current table
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from wam record data to table
+        # adds units from wam record data to table
         for unit in self.wam.get_record():
             self.table.insert("", "end", values=unit, tags=("current",))
 
-        # add units from wam extra data to table
+        # adds units from wam extra data to table
         for unit in self.wam.get_data():
             self.table.insert("", "end", values=unit)
 
@@ -330,7 +332,7 @@ class WAMPage(tk.Frame):
         unit = self.table.item(row[0])["values"]
         unit_no = int(unit[0])
  
-        # confirms that user wants to save changes
+        # confirms that user wants to remove unit
         if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove Unit {unit_no}?"):
             return
 
@@ -343,15 +345,15 @@ class WAMPage(tk.Frame):
         # updates calculated wam
         self.calculated_wam_lbl.config(text=self.wam.get_calculated_wam())
 
-        # clear current table
+        # clears current table
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from wam record data to table
+        # adds units from wam record data to table
         for unit in self.wam.get_record():
             self.table.insert("", "end", values=unit, tags=("current",))
 
-        # add units from wam extra data to table
+        # adds units from wam extra data to table
         for unit in self.wam.get_data():
             self.table.insert("", "end", values=unit)
 

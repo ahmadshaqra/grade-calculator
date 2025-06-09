@@ -33,7 +33,7 @@ class FileManager:
             with open(os.path.join(cls.folder, filename), "r") as file:
 
                 # returns the table of contents in the file
-                return [line.split() for line in file]
+                return [line.strip().split(",") for line in file]
 
         # file does not exist
         except FileNotFoundError:
@@ -58,7 +58,7 @@ class FileManager:
             for index, line in enumerate(data):
 
                 # writes a space-separated line of the data line
-                file.write(" ".join(line))
+                file.write(",".join(line))
                 if index < len(data) - 1: file.write("\n")
 
     @classmethod

@@ -33,13 +33,15 @@ class RecordPage(tk.Frame):
         table_frame.pack()
         table_frame.grid_propagate(False)
 
-        # sets the style of the table
+        # sets the style of the page
         style = ttk.Style(self)
         style.theme_use("alt")
         style.configure("Treeview", font=("Segoe UI", 10))
         style.configure("Treeview.Heading", background="lightgrey", font=("Segoe UI", 10, "bold"))
         style.map("Treeview", background=[("selected", "lightgrey")], foreground=[("selected", "black")])
         style.map("Treeview.Heading", background=[("!active", "lightgrey"), ("active", "lightgrey"), ("pressed", "lightgrey")])
+        self.option_add("*Entry.selectBackground", "lightgrey")
+        self.option_add("*Entry.selectForeground", "black")
 
         # sets columns of the table
         self.columns = ["Unit #", "Unit Code", "Mark", "Grade", "Credit Points"]
@@ -122,11 +124,11 @@ class RecordPage(tk.Frame):
             Loads page from data.
         """
 
-        # clear current table
+        # clears current table
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from record to table
+        # adds units from record to table
         for unit in self.record.get_data():
             self.table.insert("", "end", values=unit)
 
@@ -198,14 +200,14 @@ class RecordPage(tk.Frame):
             self.unit_code.bind("<Return>", lambda e: self.mark.focus_set())
 
             # creates and sets mark frame, label, and entry box
-            mark_frame = tk.LabelFrame(left_frame, text="Mark", font=("Segoe UI", 10, "bold"))
+            mark_frame = tk.LabelFrame(right_frame, text="Mark", font=("Segoe UI", 10, "bold"))
             mark_frame.pack(pady=5)
             self.mark = tk.Entry(mark_frame, width=15, font=("Segoe UI", 10))
             self.mark.pack(padx=10, pady=10)
             self.mark.bind("<Return>", lambda e: self.grade.focus_set())
 
             # creates and sets grade frame, label, and entry box
-            grade_frame = tk.LabelFrame(right_frame, text="Grade", font=("Segoe UI", 10, "bold"))
+            grade_frame = tk.LabelFrame(left_frame, text="Grade", font=("Segoe UI", 10, "bold"))
             grade_frame.pack(pady=5)
             self.grade = tk.Entry(grade_frame, width=15, font=("Segoe UI", 10))
             self.grade.pack(padx=10, pady=10)
@@ -339,7 +341,7 @@ class RecordPage(tk.Frame):
         unit_no = int(unit[0])
         unit_code = unit[1]
  
-        # confirms that user wants to save changes
+        # confirms that user wants to remove unit
         if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove {unit_code}?"):
             return
 
@@ -353,11 +355,11 @@ class RecordPage(tk.Frame):
         self.wam_lbl.config(text=self.record.get_wam())
         self.gpa_lbl.config(text=self.record.get_gpa())
 
-        # clear current table
+        # clears current table
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from record to table
+        # adds units from record to table
         for unit in self.record.get_data():
             self.table.insert("", "end", values=unit)
 

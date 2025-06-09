@@ -147,8 +147,8 @@ class Unit:
         for _, weight, score, total in self.data[unit_code]:
 
             # adds mark and weight of assessment to totals
-            total_mark += int(weight) * (int(score) / int(total))
-            total_weight += int(weight)
+            total_mark += float(weight) * (float(score) / float(total))
+            total_weight += float(weight)
 
         # checks if at least one assessment is in data
         if total_weight > 0:
@@ -176,17 +176,17 @@ class Unit:
 
             # calculates average required
             if total_weight < 100:
-                avg_req_int = (target - total_mark) * 100 / (100 - total_weight)
+                avg_req_float = (target - total_mark) * 100 / (100 - total_weight)
             else:
-                avg_req_int = -1
+                avg_req_float = -1
 
             # checks if average required is feasible
-            if avg_req_int < 0 or avg_req_int > 100:
+            if avg_req_float < 0 or avg_req_float > 100:
                 avg_req = "-"
 
             # sets average required string
             else:
-                avg_req = f"{avg_req_int:.2f}"
+                avg_req = f"{avg_req_float:.2f}"
 
         # returns unit overview
         return [unit_code, mark_grade, remaining, avg_req]
@@ -203,7 +203,7 @@ class Unit:
         """
 
         # gets and returns the assessments for the unit
-        return [[assessment, weight, f"{score / total:.2f}"] for assessment, weight, score, total in self.data[unit_code]]
+        return [[assessment, weight, f"{float(score) * 100 / float(total):.2f}"] for assessment, weight, score, total in self.data[unit_code]]
 
     def get_target(self) -> str:
         """

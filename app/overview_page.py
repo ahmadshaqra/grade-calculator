@@ -34,13 +34,15 @@ class OverviewPage(tk.Frame):
         table_frame.pack()
         table_frame.grid_propagate(False)
 
-        # sets the style of the table
+        # sets the style of the page
         style = ttk.Style(self)
         style.theme_use("alt")
         style.configure("Treeview", font=("Segoe UI", 10))
         style.configure("Treeview.Heading", background="lightgrey", font=("Segoe UI", 10, "bold"))
         style.map("Treeview", background=[("selected", "lightgrey")], foreground=[("selected", "black")])
         style.map("Treeview.Heading", background=[("!active", "lightgrey"), ("active", "lightgrey"), ("pressed", "lightgrey")])
+        self.option_add("*Entry.selectBackground", "lightgrey")
+        self.option_add("*Entry.selectForeground", "black")
 
         # sets columns of the table
         self.columns = ["Unit Code", "Mark (Grade)", "Remaining", "Average Required"]
@@ -391,7 +393,7 @@ class OverviewPage(tk.Frame):
         unit = self.table.item(row[0])["values"]
         unit_code = unit[0]
  
-        # confirms that user wants to save changes
+        # confirms that user wants to remove unit
         if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove {unit_code}?"):
             return
 
@@ -401,11 +403,11 @@ class OverviewPage(tk.Frame):
         # deletes the selected unit from unit data
         self.unit.remove_unit(unit_code)
 
-        # clear current table
+        # clears current table
         for row in self.table.get_children():
             self.table.delete(row)
 
-        # add units from overview data to table
+        # adds units from overview data to table
         for unit in self.unit.get_overview():
             self.table.insert("", "end", values=unit)
 
