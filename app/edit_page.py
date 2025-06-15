@@ -7,6 +7,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from data.unit import Unit
+from utils.asset_manager import AssetManager
 
 class EditPage(tk.Frame):
     """
@@ -190,8 +191,9 @@ class EditPage(tk.Frame):
         # sets close protocol
         self.main_window.entry_window.protocol("WM_DELETE_WINDOW", self.on_close_form_close)
 
-        # sets title
+        # sets title and icon
         self.main_window.entry_window.title("Add Assessment")
+        self.main_window.entry_window.iconbitmap(AssetManager.get_asset("icon.ico"))
 
         # sets the window dimensions
         window_width = 400

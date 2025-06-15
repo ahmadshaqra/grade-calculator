@@ -7,6 +7,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from data.unit import Unit
+from utils.asset_manager import AssetManager
 from re import fullmatch
 
 class OverviewPage(tk.Frame):
@@ -150,8 +151,9 @@ class OverviewPage(tk.Frame):
         # sets close protocol
         self.main_window.entry_window.protocol("WM_DELETE_WINDOW", self.on_close_form_close)
 
-        # sets title
+        # sets title and icon
         self.main_window.entry_window.title("Change Target")
+        self.main_window.entry_window.iconbitmap(AssetManager.get_asset("icon.ico"))
 
         # sets the window dimensions
         window_width = 400
@@ -234,8 +236,9 @@ class OverviewPage(tk.Frame):
         # sets close protocol
         self.main_window.entry_window.protocol("WM_DELETE_WINDOW", self.on_close_form_close)
 
-        # sets title
+        # sets title and icon
         self.main_window.entry_window.title("Add Unit")
+        self.main_window.entry_window.iconbitmap(AssetManager.get_asset("icon.ico"))
 
         # sets the window dimensions
         window_width = 400

@@ -5,6 +5,7 @@
 """
 
 import tkinter as tk
+from utils.asset_manager import AssetManager
 from app.record_page import RecordPage
 from app.wam_page import WAMPage
 from app.gpa_page import GPAPage
@@ -24,8 +25,9 @@ class MainWindow(tk.Tk):
         super().__init__()
         self.entry_window = None
 
-        # sets title
+        # sets title and icon
         self.title("Grade Calculator")
+        self.iconbitmap(AssetManager.get_asset("icon.ico"))
 
         # sets the window dimensions
         window_width = 700

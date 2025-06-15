@@ -7,6 +7,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from data.wam import WAM
+from utils.asset_manager import AssetManager
 
 class WAMPage(tk.Frame):
     """
@@ -167,8 +168,9 @@ class WAMPage(tk.Frame):
             # sets close protocol
             self.main_window.entry_window.protocol("WM_DELETE_WINDOW", self.on_close_add_unit_form)
 
-            # sets title
+            # sets title and icon
             self.main_window.entry_window.title("Add Unit")
+            self.main_window.entry_window.iconbitmap(AssetManager.get_asset("icon.ico"))
 
             # sets the window dimensions
             window_width = 400
