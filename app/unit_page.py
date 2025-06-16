@@ -7,7 +7,7 @@
 import tkinter as tk
 from data.unit import Unit
 from app.overview_page import OverviewPage
-from app.edit_page import EditPage
+from app.assessment_page import AssessmentPage
 
 class UnitPage(tk.Frame):
     """
@@ -39,7 +39,7 @@ class UnitPage(tk.Frame):
         # initialises available subpages
         self.subpages = {
             "Overview": OverviewPage(self.subpage_frame, self.unit, self.main_window),
-            "Edit": EditPage(self.subpage_frame, self.unit, self.main_window)
+            "Assessments": AssessmentPage(self.subpage_frame, self.unit, self.main_window)
         }
 
         # initialises menu buttons dictionary
@@ -52,7 +52,7 @@ class UnitPage(tk.Frame):
             subpage.place(relx=0, rely=0, relwidth=1, relheight=1)
 
             # creates and adds menu button
-            self.subpage_btns[name] = tk.Button(self.subpage_select_frame, text=name, font=("Segoe UI", 10, "bold"), width=10, command=lambda name=name: self.show_subpage(name))
+            self.subpage_btns[name] = tk.Button(self.subpage_select_frame, text=name, font=("Segoe UI", 10, "bold"), width=15, command=lambda name=name: self.show_subpage(name))
             self.subpage_btns[name].pack(side="left", expand=True, fill="both", padx=10)
 
     def show_subpage(self, name: str) -> None:

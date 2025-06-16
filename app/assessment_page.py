@@ -1,7 +1,7 @@
 """
-    edit_page.py
+    assessment_page.py
 
-    Contains the unit edit subpage logic.
+    Contains the unit assessment subpage logic.
 """
 
 import tkinter as tk
@@ -9,14 +9,14 @@ from tkinter import ttk, messagebox
 from data.unit import Unit
 from utils.asset_manager import AssetManager
 
-class EditPage(tk.Frame):
+class AssessmentPage(tk.Frame):
     """
-        Manages the unit edit subpage.
+        Manages the unit assessment subpage.
     """
 
     def __init__(self, root: tk.Frame, unit: Unit, main_window: tk.Tk) -> None:
         """
-            Initialises the unit edit subpage.
+            Initialises the unit assessment subpage.
 
             Args:
                 root (tk.Frame): the subpage contents frame.

@@ -192,7 +192,7 @@ class Unit:
 
     def get_unit_assessments(self, unit_code: str) -> list[list[str]]:
         """
-            Gets the assessments of a unit for the edit page.
+            Gets the assessments of a unit for the assessments page.
 
             Args:
                 unit_code (str): the unit code of the unit.
