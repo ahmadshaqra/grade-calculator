@@ -20,7 +20,7 @@ pwd
 Finally, run the following `pyinstaller` command to build the executable:
 
 ```bash
-pyinstaller main.py --name=GradeCalculator --add-data="assets:assets" --icon=assets/icon.ico --onefile -w
+pyinstaller main.py --name="Grade Calculator" --add-data="assets:assets" --icon="assets/icon.ico" --onefile -w
 ```
 
 After successfully building your executable, you will find the `main.exe` file in the `dist` folder.
