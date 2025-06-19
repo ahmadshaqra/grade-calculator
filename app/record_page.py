@@ -155,6 +155,7 @@ class RecordPage(tk.Frame):
 
             # creates the entry window
             self.main_window.entry_window = tk.Toplevel(self)
+            self.main_window.entry_window.withdraw()
 
             # sets close protocol
             self.main_window.entry_window.protocol("WM_DELETE_WINDOW", self.on_close_add_unit_form)
@@ -233,6 +234,9 @@ class RecordPage(tk.Frame):
             # adds input error label
             self.input_error_lbl = tk.Label(self.main_window.entry_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
             self.input_error_lbl.pack()
+
+            # shows form
+            self.main_window.entry_window.deiconify()
 
         # add unit form already open
         else:

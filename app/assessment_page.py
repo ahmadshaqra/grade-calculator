@@ -187,6 +187,7 @@ class AssessmentPage(tk.Frame):
 
         # creates the entry window
         self.main_window.entry_window = tk.Toplevel(self)
+        self.main_window.entry_window.withdraw()
 
         # sets close protocol
         self.main_window.entry_window.protocol("WM_DELETE_WINDOW", self.on_close_form_close)
@@ -265,6 +266,9 @@ class AssessmentPage(tk.Frame):
         # adds input error label
         self.input_error_lbl = tk.Label(self.main_window.entry_window, text="", font=("Segoe UI", 8, "italic"), fg="red")
         self.input_error_lbl.pack()
+
+        # shows form
+        self.main_window.entry_window.deiconify()
 
         # sets focus on unit code entry box
         self.assessment_name.focus_set()

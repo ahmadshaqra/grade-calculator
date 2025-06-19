@@ -23,6 +23,7 @@ class MainWindow(tk.Tk):
 
         # initialises main window and entry window
         super().__init__()
+        self.withdraw()
         self.entry_window = None
 
         # sets title and icon
@@ -76,6 +77,9 @@ class MainWindow(tk.Tk):
             # creates and adds menu button
             self.menu_btns[name] = tk.Button(self.menu_frame, text=name, font=("Segoe UI", 10, "bold"), width=10, command=lambda name=name: self.show_page(name))
             self.menu_btns[name].pack(side="left", expand=True, fill="both", padx=10)
+
+        # shows window
+        self.deiconify()
 
         # selects the first page
         self.show_page(next(iter(self.pages)))
