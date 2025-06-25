@@ -235,14 +235,14 @@ class AssessmentPage(tk.Frame):
         self.assessment_name.bind("<Return>", lambda e: self.weight.focus_set())
 
         # creates and sets weight frame, label, and entry box
-        weight_frame = tk.LabelFrame(right_frame, text="Weight", font=("Segoe UI", 10, "bold"))
+        weight_frame = tk.LabelFrame(left_frame, text="Weight", font=("Segoe UI", 10, "bold"))
         weight_frame.pack(pady=5)
         self.weight = tk.Entry(weight_frame, width=15, font=("Segoe UI", 10))
         self.weight.pack(padx=10, pady=10)
         self.weight.bind("<Return>", lambda e: self.obtained_marks.focus_set())
 
         # creates and sets obtained marks frame, label, and entry box
-        obtained_marks_frame = tk.LabelFrame(left_frame, text="Obtained Marks", font=("Segoe UI", 10, "bold"))
+        obtained_marks_frame = tk.LabelFrame(right_frame, text="Obtained Marks", font=("Segoe UI", 10, "bold"))
         obtained_marks_frame.pack(pady=5)
         self.obtained_marks = tk.Entry(obtained_marks_frame, width=15, font=("Segoe UI", 10))
         self.obtained_marks.pack(padx=10, pady=10)

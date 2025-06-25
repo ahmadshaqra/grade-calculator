@@ -57,6 +57,9 @@ class WAM:
         # iterates through each unit in the record
         for year_lvl, mark, credit_pts in self.record:
 
+            # checks if there are no marks
+            if mark == "-": continue
+
             # gets weighting of unit
             weight = 0.5 if year_lvl == '1' else 1.0
 
@@ -86,6 +89,9 @@ class WAM:
 
         # iterates through each unit in the record
         for year_lvl, mark, credit_pts in self.record + self.data:
+
+            # checks if there are no marks
+            if mark == "-": continue
 
             # gets weighting of unit
             weight = 0.5 if year_lvl == '1' else 1.0

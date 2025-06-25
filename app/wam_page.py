@@ -272,7 +272,7 @@ class WAMPage(tk.Frame):
         # validates year level
         try:
             year_lvl = int(year_lvl)
-            if year_lvl < 1 or year_lvl > 9:
+            if year_lvl < 0 or year_lvl > 9:
                 raise ValueError
         except ValueError:
             self.year_lvl.focus_set()
@@ -282,9 +282,12 @@ class WAMPage(tk.Frame):
 
         # validates mark
         try:
-            mark = int(mark)
-            if mark < 0 or mark > 100:
-                raise ValueError
+            if mark in ["", "-"]:
+                mark = "-"
+            else:
+                mark = int(mark)
+                if mark < 0 or mark > 100:
+                    raise ValueError
         except ValueError:
             self.mark.focus_set()
             self.input_error_lbl.config(text="Input Error: Mark is invalid.")

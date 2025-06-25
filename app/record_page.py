@@ -200,21 +200,21 @@ class RecordPage(tk.Frame):
             unit_code_frame.pack(pady=5)
             self.unit_code = tk.Entry(unit_code_frame, width=15, font=("Segoe UI", 10))
             self.unit_code.pack(padx=10, pady=10)
-            self.unit_code.bind("<Return>", lambda e: self.mark.focus_set())
-
-            # creates and sets mark frame, label, and entry box
-            mark_frame = tk.LabelFrame(right_frame, text="Mark", font=("Segoe UI", 10, "bold"))
-            mark_frame.pack(pady=5)
-            self.mark = tk.Entry(mark_frame, width=15, font=("Segoe UI", 10))
-            self.mark.pack(padx=10, pady=10)
-            self.mark.bind("<Return>", lambda e: self.grade.focus_set())
+            self.unit_code.bind("<Return>", lambda e: self.grade.focus_set())
 
             # creates and sets grade frame, label, and entry box
             grade_frame = tk.LabelFrame(left_frame, text="Grade", font=("Segoe UI", 10, "bold"))
             grade_frame.pack(pady=5)
             self.grade = tk.Entry(grade_frame, width=15, font=("Segoe UI", 10))
             self.grade.pack(padx=10, pady=10)
-            self.grade.bind("<Return>", lambda e: self.credit_pts.focus_set())
+            self.grade.bind("<Return>", lambda e: self.mark.focus_set())
+
+            # creates and sets mark frame, label, and entry box
+            mark_frame = tk.LabelFrame(right_frame, text="Mark", font=("Segoe UI", 10, "bold"))
+            mark_frame.pack(pady=5)
+            self.mark = tk.Entry(mark_frame, width=15, font=("Segoe UI", 10))
+            self.mark.pack(padx=10, pady=10)
+            self.mark.bind("<Return>", lambda e: self.credit_pts.focus_set())
 
             # creates and sets credit points frame, label, and entry box
             credit_pts_frame = tk.LabelFrame(right_frame, text="Credit Points", font=("Segoe UI", 10, "bold"))
@@ -274,25 +274,31 @@ class RecordPage(tk.Frame):
             self.input_error_lbl.config(text="Input Error: Unit code is invalid.")
             return
 
+        # validates grade
+        if grade not in ["WN", "WDN", "SFR", "PGO", "NSR", "NH", "NGO", "NE", "NAS", "N", "P", "C", "D", "HD"]:
+            self.grade.focus_set()
+            self.input_error_lbl.config(text="Input Error: Grade is invalid.")
+            return
+
         # validates mark
         try:
-            mark = int(mark)
-            if mark < 0 or mark > 100:
-                raise ValueError
+            if grade in ["WN", "WDN", "SFR", "PGO", "NSR", "NGO", "NE", "NAS"]:
+                if mark not in ["", "-"]:
+                    raise ValueError
+                else:
+                    mark = "-"
+            else:
+                mark = int(mark)
+                if (grade == "NH" and mark != 45) or \
+                   (grade == "N" and (mark < 0 or mark > 49)) or \
+                   (grade == "P" and (mark < 50 or mark > 59)) or \
+                   (grade == "C" and (mark < 60 or mark > 69)) or \
+                   (grade == "D" and (mark < 70 or mark > 79)) or \
+                   (grade == "HD" and (mark < 80 or mark > 100)):
+                    raise ValueError
         except ValueError:
             self.mark.focus_set()
             self.input_error_lbl.config(text="Input Error: Mark is invalid.")
-            return
-
-        # validates grade
-        if (grade == "WN" and mark != 0) or \
-           (0 <= mark <= 49 and grade not in ["WN", "N"]) or \
-           (50 <= mark <= 59 and grade != "P") or \
-           (60 <= mark <= 69 and grade != "C") or \
-           (70 <= mark <= 79 and grade != "D") or \
-           (80 <= mark <= 100 and grade != "HD"):
-            self.grade.focus_set()
-            self.input_error_lbl.config(text="Input Error: Grade is invalid.")
             return
 
         # validates credit points

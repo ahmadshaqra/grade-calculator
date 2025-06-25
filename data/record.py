@@ -45,6 +45,9 @@ class Record:
         # iterates through each unit in the record
         for unit_code, mark, _, credit_pts in self.data:
 
+            # checks if there are no marks
+            if mark == "-": continue
+
             # gets weighting of unit
             weight = 0.5 if unit_code[3] == '1' else 1.0
 
@@ -79,6 +82,8 @@ class Record:
             match grade:
                 case "WN":
                     grade_value = 0.0
+                case "NH":
+                    grade_value = 0.3
                 case "N":
                     grade_value = 0.3
                 case "P":
@@ -89,6 +94,8 @@ class Record:
                     grade_value = 3.0
                 case "HD":
                     grade_value = 4.0
+                case _:
+                    continue
 
             # adds unit grade value and credits to totals
             total_grade += grade_value * int(credit_pts)

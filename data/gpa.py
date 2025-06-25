@@ -61,6 +61,8 @@ class GPA:
             match grade:
                 case "WN":
                     grade_value = 0.0
+                case "NH":
+                    grade_value = 0.3
                 case "N":
                     grade_value = 0.3
                 case "P":
@@ -71,6 +73,8 @@ class GPA:
                     grade_value = 3.0
                 case "HD":
                     grade_value = 4.0
+                case _:
+                    continue
 
             # adds unit grade value and credits to totals
             total_grade += grade_value * int(credit_pts)
@@ -103,6 +107,8 @@ class GPA:
             match grade:
                 case "WN":
                     grade_value = 0.0
+                case "NH":
+                    grade_value = 0.3
                 case "N":
                     grade_value = 0.3
                 case "P":
@@ -113,6 +119,8 @@ class GPA:
                     grade_value = 3.0
                 case "HD":
                     grade_value = 4.0
+                case _:
+                    continue
 
             # adds unit grade value and credits to totals
             total_grade += grade_value * int(credit_pts)

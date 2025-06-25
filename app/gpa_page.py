@@ -250,7 +250,7 @@ class GPAPage(tk.Frame):
         credit_pts = self.credit_pts.get()
 
         # validates grade
-        if grade not in ["WN", "N", "P", "C", "D", "HD"]:
+        if grade not in ["WN", "WDN", "SFR", "PGO", "NSR", "NH", "NGO", "NE", "NAS", "N", "P", "C", "D", "HD"]:
             self.grade.focus_set()
             self.input_error_lbl.config(text="Input Error: Grade is invalid.")
             return
