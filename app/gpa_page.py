@@ -258,7 +258,7 @@ class GPAPage(tk.Frame):
         # validates credit points
         try:
             credit_pts = int(credit_pts)
-            if credit_pts < 1 or credit_pts > 24:
+            if credit_pts not in [0, 6, 12, 18, 24]:
                 raise ValueError
         except ValueError:
             self.credit_pts.focus_set()
