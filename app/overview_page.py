@@ -308,7 +308,7 @@ class OverviewPage(tk.Frame):
 
         # validates target if target type is set to grade
         if self.change_target_type == "Grade":
-            if target not in ["N", "P", "C", "D", "HD"]:
+            if target not in ["P", "C", "D", "HD"]:
                 self.target.focus_set()
                 self.input_error_lbl.config(text="Input Error: Target grade is invalid.")
                 return
@@ -317,7 +317,7 @@ class OverviewPage(tk.Frame):
         elif self.change_target_type == "Mark":
             try:
                 target = int(target)
-                if target < 0 or target > 100:
+                if target < 50 or target > 100:
                     raise ValueError
             except ValueError:
                 self.target.focus_set()

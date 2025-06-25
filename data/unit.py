@@ -119,8 +119,6 @@ class Unit:
         # sets target if target type is grade
         if self.target_type == "Grade":
             match self.target:
-                case "N":
-                    target = 0
                 case "P":
                     target = 50
                 case "C":
