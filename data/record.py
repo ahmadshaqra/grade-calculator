@@ -17,7 +17,7 @@ class Record:
         """
 
         # gets data from file
-        self.data = FileManager.read_file("record.txt")
+        self.data = FileManager.read_file("record")
 
     def get_data(self) -> list[list[str]]:
         """
@@ -114,7 +114,7 @@ class Record:
         self.data.append(unit)
 
         # writes data to file
-        FileManager.write_file("record.txt", self.data)
+        FileManager.write_file("record", self.data)
 
     def remove_unit(self, unit_no: int) -> None:
         """
@@ -128,4 +128,4 @@ class Record:
         self.data.pop(unit_no - 1)
 
         # writes data to file
-        FileManager.write_file("record.txt", self.data)
+        FileManager.write_file("record", self.data)

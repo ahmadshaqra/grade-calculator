@@ -24,10 +24,10 @@ class Unit:
 
         # adds unit data to dictionary
         for unit_file in unit_files:
-            self.data[unit_file[:-4]] = FileManager.read_file(unit_file)
+            self.data[unit_file] = FileManager.read_file(unit_file)
 
         # gets target data from file
-        target = FileManager.read_file("target.txt")
+        target = FileManager.read_file("target")
 
         # initialises target from file data
         if target:
@@ -38,7 +38,7 @@ class Unit:
         else:
             self.target_type = "Grade"
             self.target = "HD"
-            FileManager.write_file("target.txt", [[self.target_type, self.target]])
+            FileManager.write_file("target", [[self.target_type, self.target]])
 
     def add_unit(self, unit_code: str) -> None:
         """
@@ -49,7 +49,7 @@ class Unit:
         """
 
         # adds unit to file system and refreshes
-        FileManager.create_file(f"{unit_code}.txt")
+        FileManager.create_file(f"{unit_code}")
         self.reset()
 
     def remove_unit(self, unit_code: str) -> None:
@@ -61,7 +61,7 @@ class Unit:
         """
 
         # removes unit from file system and refreshes
-        FileManager.delete_file(f"{unit_code}.txt")
+        FileManager.delete_file(f"{unit_code}")
         self.reset()
 
     def add_assessment(self, unit_code: str, assessment: list[str]) -> None:
@@ -77,7 +77,7 @@ class Unit:
         self.data[unit_code].append(assessment)
 
         # saves data to file
-        FileManager.write_file(f"{unit_code}.txt", self.data[unit_code])
+        FileManager.write_file(f"{unit_code}", self.data[unit_code])
 
     def remove_assessment(self, unit_code: str, assessment_no: int) -> None:
         """
@@ -92,7 +92,7 @@ class Unit:
         self.data[unit_code].pop(assessment_no)
 
         # saves data to file
-        FileManager.write_file(f"{unit_code}.txt", self.data[unit_code])
+        FileManager.write_file(f"{unit_code}", self.data[unit_code])
 
     def get_overview(self) -> list[list[str]]:
         """
@@ -229,7 +229,7 @@ class Unit:
         self.target = target
 
         # saves new target to file
-        FileManager.write_file("target.txt", [[self.target_type, self.target]])
+        FileManager.write_file("target", [[self.target_type, self.target]])
 
     def reset(self) -> None:
         """
@@ -244,9 +244,9 @@ class Unit:
 
         # adds unit data to dictionary
         for unit_file in unit_files:
-            self.data[unit_file[:-4]] = FileManager.read_file(unit_file)
+            self.data[unit_file] = FileManager.read_file(unit_file)
 
         # gets target data from file
-        target = FileManager.read_file("target.txt")
+        target = FileManager.read_file("target")
         self.target = target[0][1]
         self.target_type = target[0][0]

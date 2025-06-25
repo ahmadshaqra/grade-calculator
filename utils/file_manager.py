@@ -105,7 +105,7 @@ class FileManager:
         """
 
         # sets the unit filename regular expression
-        unit_filename = compile(r"[A-Z]{3}\d{4}\.txt")
+        unit_filename = compile(r"[A-Z]{3}\d{4}")
 
         # finds all unit filenames
         unit_files = [

@@ -17,8 +17,8 @@ class GPA:
         """
 
         # gets data from files
-        self.record = [[grade, credit_pts] for _, _, grade, credit_pts in FileManager.read_file("record.txt")]
-        self.data = FileManager.read_file("gpa.txt")
+        self.record = [[grade, credit_pts] for _, _, grade, credit_pts in FileManager.read_file("record")]
+        self.data = FileManager.read_file("gpa")
 
     def get_record(self) -> list[list[str]]:
         """
@@ -138,7 +138,7 @@ class GPA:
         self.data.append(unit)
 
         # saves data to file
-        FileManager.write_file("gpa.txt", self.data)
+        FileManager.write_file("gpa", self.data)
 
     def remove_unit(self, unit_no: int) -> None:
         """
@@ -152,7 +152,7 @@ class GPA:
         self.data.pop(unit_no - len(self.record) - 1)
 
         # saves data to file
-        FileManager.write_file("gpa.txt", self.data)
+        FileManager.write_file("gpa", self.data)
 
     def reset(self) -> None:
         """
@@ -160,5 +160,5 @@ class GPA:
         """
 
         # gets data from files
-        self.record = [[grade, credit_pts] for _, _, grade, credit_pts in FileManager.read_file("record.txt")]
-        self.data = FileManager.read_file("gpa.txt")
+        self.record = [[grade, credit_pts] for _, _, grade, credit_pts in FileManager.read_file("record")]
+        self.data = FileManager.read_file("gpa")

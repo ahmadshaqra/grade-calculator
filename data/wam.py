@@ -17,8 +17,8 @@ class WAM:
         """
 
         # gets data from files
-        self.record = [[unit_code[3], mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
-        self.data = FileManager.read_file("wam.txt")
+        self.record = [[unit_code[3], mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record")]
+        self.data = FileManager.read_file("wam")
 
     def get_record(self) -> list[list[str]]:
         """
@@ -114,7 +114,7 @@ class WAM:
         self.data.append(unit)
 
         # saves data to file
-        FileManager.write_file("wam.txt", self.data)
+        FileManager.write_file("wam", self.data)
 
     def remove_unit(self, unit_no: int) -> None:
         """
@@ -128,7 +128,7 @@ class WAM:
         self.data.pop(unit_no - len(self.record) - 1)
 
         # saves data to file
-        FileManager.write_file("wam.txt", self.data)
+        FileManager.write_file("wam", self.data)
 
     def reset(self) -> None:
         """
@@ -136,5 +136,5 @@ class WAM:
         """
 
         # gets data from files
-        self.record = [[unit_code[3], mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record.txt")]
-        self.data = FileManager.read_file("wam.txt")
+        self.record = [[unit_code[3], mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record")]
+        self.data = FileManager.read_file("wam")
