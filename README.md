@@ -23,4 +23,4 @@ Finally, run the following `pyinstaller` command to build the executable:
 pyinstaller main.py --name="Grade Calculator" --add-data="assets:assets" --icon="assets/icon.ico" --onefile -w
 ```
 
-After successfully building your executable, you will find the `main.exe` file in the `dist` folder.
+After successfully building your executable, you will find the `Grade Calculator.exe` file in the `dist` folder.

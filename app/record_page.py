@@ -45,8 +45,8 @@ class RecordPage(tk.Frame):
         self.option_add("*Entry.selectForeground", "black")
 
         # sets columns of the table
-        self.columns = ["Unit #", "Unit Code", "Mark", "Grade", "Credit Points"]
-        self.column_width = 96
+        self.columns = ["Unit Code", "Mark", "Grade", "Credit Points"]
+        self.column_width = 120
 
         # initialises table
         self.table = ttk.Treeview(table_frame, columns=self.columns, show="headings", height=12)
@@ -269,9 +269,17 @@ class RecordPage(tk.Frame):
         credit_pts = self.credit_pts.get()
 
         # validates unit code
-        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code) or unit_code in [unit for _, unit, _, _, _ in self.record.get_data()]:
+        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code):
             self.unit_code.focus_set()
             self.input_error_lbl.config(text="Input Error: Unit code is invalid.")
+            return
+        if unit_code in self.record.get_record_units():
+            self.unit_code.focus_set()
+            self.input_error_lbl.config(text="Input Error: Unit code already used.")
+            return
+        if unit_code in self.record.get_extra_units():
+            self.unit_code.focus_set()
+            self.input_error_lbl.config(text="Input Error: Unit code already used in WAM or GPA pages.")
             return
 
         # validates grade
@@ -350,8 +358,7 @@ class RecordPage(tk.Frame):
 
         # gets unit details
         unit = self.table.item(row[0])["values"]
-        unit_no = int(unit[0])
-        unit_code = unit[1]
+        unit_code = unit[0]
  
         # confirms that user wants to remove unit
         if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove {unit_code}?"):
@@ -361,7 +368,7 @@ class RecordPage(tk.Frame):
         self.table.see(row)
 
         # deletes the selected unit from record
-        self.record.remove_unit(unit_no)
+        self.record.remove_unit(unit_code)
 
         # updates wam and gpa
         self.wam_lbl.config(text=self.record.get_wam())

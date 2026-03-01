@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from data.wam import WAM
 from utils.asset_manager import AssetManager
+from re import fullmatch
 
 class WAMPage(tk.Frame):
     """
@@ -44,8 +45,8 @@ class WAMPage(tk.Frame):
         self.option_add("*Entry.selectForeground", "black")
 
         # sets columns of the table
-        self.columns = ["Unit #", "Year Level", "Mark", "Credit Points"]
-        self.column_width = 120
+        self.columns = ["Unit Code", "Mark", "Credit Points"]
+        self.column_width = 160
 
         # initialises table
         self.table = ttk.Treeview(table_frame, columns=self.columns, show="headings", height=12)
@@ -204,12 +205,12 @@ class WAMPage(tk.Frame):
             right_frame = tk.Frame(entry_frame)
             right_frame.pack(side="left", expand=True, fill="both", padx=5)
 
-            # creates and sets year level frame, label, and entry box
-            year_lvl_frame = tk.LabelFrame(left_frame, text="Year Level", font=("Segoe UI", 10, "bold"))
-            year_lvl_frame.pack(pady=5)
-            self.year_lvl = tk.Entry(year_lvl_frame, width=15, font=("Segoe UI", 10))
-            self.year_lvl.pack(padx=10, pady=10)
-            self.year_lvl.bind("<Return>", lambda e: self.mark.focus_set())
+            # creates and sets unit code frame, label, and entry box
+            unit_code_frame = tk.LabelFrame(left_frame, text="Unit Code", font=("Segoe UI", 10, "bold"))
+            unit_code_frame.pack(pady=5)
+            self.unit_code = tk.Entry(unit_code_frame, width=15, font=("Segoe UI", 10))
+            self.unit_code.pack(padx=10, pady=10)
+            self.unit_code.bind("<Return>", lambda e: self.mark.focus_set())
 
             # creates and sets mark frame, label, and entry box
             mark_frame = tk.LabelFrame(right_frame, text="Mark", font=("Segoe UI", 10, "bold"))
@@ -247,8 +248,8 @@ class WAMPage(tk.Frame):
             self.main_window.entry_window.deiconify()
             self.main_window.entry_window.lift()
 
-        # sets focus on year level entry box
-        self.year_lvl.focus_set()
+        # sets focus on unit code entry box
+        self.unit_code.focus_set()
 
     def on_close_add_unit_form(self) -> None:
         """
@@ -265,20 +266,19 @@ class WAMPage(tk.Frame):
         """
 
         # gets all the unit details from entry boxes
-        year_lvl = self.year_lvl.get()
+        unit_code = self.unit_code.get().upper()
         mark = self.mark.get()
         credit_pts = self.credit_pts.get()
 
-        # validates year level
-        try:
-            year_lvl = int(year_lvl)
-            if year_lvl < 0 or year_lvl > 9:
-                raise ValueError
-        except ValueError:
-            self.year_lvl.focus_set()
-            self.input_error_lbl.config(text="Input Error: Year level is invalid.")
+        # validates unit code
+        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code):
+            self.unit_code.focus_set()
+            self.input_error_lbl.config(text="Input Error: Unit code is invalid.")
             return
-        year_lvl = str(year_lvl)
+        if unit_code in [unit for unit, _, _ in self.wam.get_record()] + [unit for unit, _, _ in self.wam.get_data()]:
+            self.unit_code.focus_set()
+            self.input_error_lbl.config(text="Input Error: Unit code already used.")
+            return
 
         # validates mark
         try:
@@ -306,7 +306,7 @@ class WAMPage(tk.Frame):
         credit_pts = str(credit_pts)
 
         # adds unit to the wam and table
-        self.wam.add_unit([year_lvl, mark, credit_pts])
+        self.wam.add_unit([unit_code, mark, credit_pts])
         self.table.insert("", "end", values=self.wam.get_data()[-1])
 
         # scrolls table all the way down
@@ -339,17 +339,17 @@ class WAMPage(tk.Frame):
 
         # gets unit details
         unit = self.table.item(row[0])["values"]
-        unit_no = int(unit[0])
+        unit_code = unit[0]
  
         # confirms that user wants to remove unit
-        if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove Unit {unit_no}?"):
+        if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove {unit_code}?"):
             return
 
         # scrolls table view to selected row
         self.table.see(row)
 
         # deletes the selected unit from wam
-        self.wam.remove_unit(unit_no)
+        self.wam.remove_unit(unit_code)
 
         # updates calculated wam
         self.calculated_wam_lbl.config(text=self.wam.get_calculated_wam())
@@ -370,4 +370,4 @@ class WAMPage(tk.Frame):
         self.table.focus_set()
 
         # displays success message to user
-        messagebox.showinfo("Remove Unit", f"Unit {unit_no} removed.")
+        messagebox.showinfo("Remove Unit", f"{unit_code} removed.")

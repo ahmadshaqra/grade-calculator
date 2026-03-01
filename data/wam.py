@@ -17,7 +17,7 @@ class WAM:
         """
 
         # gets data from files
-        self.record = [[unit_code[3], mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record")]
+        self.record = [[unit_code, mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record")]
         self.data = FileManager.read_file("wam")
 
     def get_record(self) -> list[list[str]]:
@@ -29,7 +29,7 @@ class WAM:
         """
 
         # returns the record array
-        return [[i + 1] + self.record[i] for i in range(len(self.record))]
+        return self.record
 
     def get_data(self) -> list[list[str]]:
         """
@@ -40,7 +40,7 @@ class WAM:
         """
 
         # returns the data array
-        return [[i + len(self.record) + 1] + self.data[i] for i in range(len(self.data))]
+        return self.data
 
     def get_current_wam(self) -> str:
         """
@@ -55,13 +55,13 @@ class WAM:
         weighted_credits = 0
 
         # iterates through each unit in the record
-        for year_lvl, mark, credit_pts in self.record:
+        for unit_code, mark, credit_pts in self.record:
 
             # checks if there are no marks
             if mark == "-": continue
 
             # gets weighting of unit
-            weight = 0.5 if year_lvl == '1' else 1.0
+            weight = 0.5 if unit_code[3] == '1' else 1.0
 
             # adds unit weighted marks and credits to totals
             weighted_marks += int(mark) * int(credit_pts) * weight
@@ -88,13 +88,13 @@ class WAM:
         weighted_credits = 0
 
         # iterates through each unit in the record
-        for year_lvl, mark, credit_pts in self.record + self.data:
+        for unit_code, mark, credit_pts in self.record + self.data:
 
             # checks if there are no marks
             if mark == "-": continue
 
             # gets weighting of unit
-            weight = 0.5 if year_lvl == '1' else 1.0
+            weight = 0.5 if unit_code[3] == '1' else 1.0
 
             # adds unit weighted marks and credits to totals
             weighted_marks += int(mark) * int(credit_pts) * weight
@@ -122,16 +122,16 @@ class WAM:
         # saves data to file
         FileManager.write_file("wam", self.data)
 
-    def remove_unit(self, unit_no: int) -> None:
+    def remove_unit(self, unit_code: str) -> None:
         """
             Removes a unit in the WAM data.
 
             Args:
-                unit_no (int): the unit to delete.
+                unit_code (str): the unit to delete.
         """
 
         # deletes unit from data
-        self.data.pop(unit_no - len(self.record) - 1)
+        self.data = [unit for unit in self.data if unit[0] != unit_code]
 
         # saves data to file
         FileManager.write_file("wam", self.data)
@@ -142,5 +142,5 @@ class WAM:
         """
 
         # gets data from files
-        self.record = [[unit_code[3], mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record")]
+        self.record = [[unit_code, mark, credit_pts] for unit_code, mark, _, credit_pts in FileManager.read_file("record")]
         self.data = FileManager.read_file("wam")

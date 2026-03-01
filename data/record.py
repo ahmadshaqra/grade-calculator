@@ -28,7 +28,7 @@ class Record:
         """
 
         # returns the data array
-        return [[i + 1] + self.data[i] for i in range(len(self.data))]
+        return self.data
 
     def get_wam(self) -> str:
         """
@@ -108,6 +108,29 @@ class Record:
         # calculates and returns gpa rounded to 3 decimal places
         gpa = total_grade / total_credits
         return f"{gpa:05.3f}"
+    
+    def get_record_units(self) -> list[str]:
+        """
+            Gets all unit codes in record.
+
+            Returns:
+                list[str]: the list of unit codes.
+        """
+
+        # gets unit codes of record and returns it
+        return [unit_code for unit_code, _, _, _ in FileManager.read_file("record")]
+
+    def get_extra_units(self) -> list[str]:
+        """
+            Gets all unit codes in WAM and GPA files.
+
+            Returns:
+                list[str]: the list of unit codes.
+        """
+
+        # combines all unit codes into one array and returns it
+        return [unit_code for unit_code, _, _ in FileManager.read_file("wam")] \
+             + [unit_code for unit_code, _, _ in FileManager.read_file("gpa")]
 
     def add_unit(self, unit: list[str]) -> None:
         """
@@ -123,16 +146,16 @@ class Record:
         # writes data to file
         FileManager.write_file("record", self.data)
 
-    def remove_unit(self, unit_no: int) -> None:
+    def remove_unit(self, unit_code: str) -> None:
         """
             Removes a unit in the record.
 
             Args:
-                unit_no (int): the unit to delete.
+                unit_code (str): the unit to delete.
         """
 
         # deletes unit from data
-        self.data.pop(unit_no - 1)
+        self.data = [unit for unit in self.data if unit[0] != unit_code]
 
         # writes data to file
         FileManager.write_file("record", self.data)

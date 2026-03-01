@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from data.gpa import GPA
 from utils.asset_manager import AssetManager
+from re import fullmatch
 
 class GPAPage(tk.Frame):
     """
@@ -44,7 +45,7 @@ class GPAPage(tk.Frame):
         self.option_add("*Entry.selectForeground", "black")
 
         # sets columns of the table
-        self.columns = ["Unit #", "Grade", "Credit Points"]
+        self.columns = ["Unit Code", "Grade", "Credit Points"]
         self.column_width = 160
 
         # initialises table
@@ -192,8 +193,27 @@ class GPAPage(tk.Frame):
             # adds title label
             tk.Label(self.main_window.entry_window, text="Add Details for New Unit", font=("Segoe UI", 10, "bold")).pack(pady=10)
 
-            # creates and sets mark frame, label, and entry box
-            grade_frame = tk.LabelFrame(self.main_window.entry_window, text="Grade", font=("Segoe UI", 10, "bold"))
+            # sets entry frame
+            entry_frame = tk.Frame(self.main_window.entry_window)
+            entry_frame.pack(pady=0)
+
+            # sets left frame
+            left_frame = tk.Frame(entry_frame)
+            left_frame.pack(side="left", expand=True, fill="both", padx=5)
+
+            # sets right frame
+            right_frame = tk.Frame(entry_frame)
+            right_frame.pack(side="left", expand=True, fill="both", padx=5)
+
+            # creates and sets unit code frame, label, and entry box
+            unit_code_frame = tk.LabelFrame(left_frame, text="Unit Code", font=("Segoe UI", 10, "bold"))
+            unit_code_frame.pack(pady=5)
+            self.unit_code = tk.Entry(unit_code_frame, width=15, font=("Segoe UI", 10))
+            self.unit_code.pack(padx=10, pady=10)
+            self.unit_code.bind("<Return>", lambda e: self.grade.focus_set())
+
+            # creates and sets grade frame, label, and entry box
+            grade_frame = tk.LabelFrame(right_frame, text="Grade", font=("Segoe UI", 10, "bold"))
             grade_frame.pack(pady=5)
             self.grade = tk.Entry(grade_frame, width=15, font=("Segoe UI", 10))
             self.grade.pack(padx=10, pady=10)
@@ -228,8 +248,8 @@ class GPAPage(tk.Frame):
             self.main_window.entry_window.deiconify()
             self.main_window.entry_window.lift()
 
-        # sets focus on grade entry box
-        self.grade.focus_set()
+        # sets focus on unit code entry box
+        self.unit_code.focus_set()
 
     def on_close_add_unit_form(self) -> None:
         """
@@ -246,8 +266,19 @@ class GPAPage(tk.Frame):
         """
 
         # gets all the unit details from entry boxes
+        unit_code = self.unit_code.get().upper()
         grade = self.grade.get().upper()
         credit_pts = self.credit_pts.get()
+
+        # validates unit code
+        if not fullmatch(r"[A-Z]{3}\d{4}", unit_code):
+            self.unit_code.focus_set()
+            self.input_error_lbl.config(text="Input Error: Unit code is invalid.")
+            return
+        if unit_code in [unit for unit, _, _ in self.gpa.get_record()] + [unit for unit, _, _ in self.gpa.get_data()]:
+            self.unit_code.focus_set()
+            self.input_error_lbl.config(text="Input Error: Unit code already used.")
+            return
 
         # validates grade
         if grade not in ["WN", "WDN", "SFR", "PGO", "NSR", "NH", "NGO", "NE", "NAS", "N", "P", "C", "D", "HD"]:
@@ -267,7 +298,7 @@ class GPAPage(tk.Frame):
         credit_pts = str(credit_pts)
 
         # adds unit to the gpa and table
-        self.gpa.add_unit([grade, credit_pts])
+        self.gpa.add_unit([unit_code, grade, credit_pts])
         self.table.insert("", "end", values=self.gpa.get_data()[-1])
 
         # scrolls table all the way down
@@ -300,17 +331,17 @@ class GPAPage(tk.Frame):
 
         # gets unit details
         unit = self.table.item(row[0])["values"]
-        unit_no = int(unit[0])
+        unit_code = unit[0]
  
         # confirms that user wants to remove unit
-        if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove Unit {unit_no}?"):
+        if not messagebox.askyesno("Remove Unit", f"Are you sure you want to remove {unit_code}?"):
             return
 
         # scrolls table view to selected row
         self.table.see(row)
 
         # deletes the selected unit from gpa
-        self.gpa.remove_unit(unit_no)
+        self.gpa.remove_unit(unit_code)
 
         # updates calculated gpa
         self.calculated_gpa_lbl.config(text=self.gpa.get_calculated_gpa())
@@ -331,4 +362,4 @@ class GPAPage(tk.Frame):
         self.table.focus_set()
 
         # displays success message to user
-        messagebox.showinfo("Remove Unit", f"Unit {unit_no} removed.")
+        messagebox.showinfo("Remove Unit", f"{unit_code} removed.")
